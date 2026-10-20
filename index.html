@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Big 12 Standings &amp; Scenarios</title>
+<style>
+:root{--bg:#0f1420;--card:#192033;--ink:#eef2fb;--mut:#93a0bd;--a:#f5b700;--b:#4cc3ff}
+*{box-sizing:border-box}body{margin:0;font:15px/1.4 system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+header{padding:22px 16px 6px;text-align:center}h1{margin:0;font-size:26px}header p{color:var(--mut);margin:6px 0 0}
+main{max-width:1000px;margin:auto;padding:12px 14px 50px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:14px 0}
+button,select{background:var(--card);color:var(--ink);border:1px solid #2c3858;border-radius:9px;padding:10px 14px;font:inherit;cursor:pointer}
+button.p{background:var(--a);color:#111;border:0;font-weight:700}button:hover{filter:brightness(1.15)}
+.quads{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.q{background:var(--card);border-radius:12px;padding:12px;border-top:4px solid #555}
+.q h3{margin:0 0 6px;font-size:14px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+.q div.t{padding:3px 0}
+.divs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.d{border-radius:12px;padding:12px;background:var(--card)}.d.A{border-left:5px solid var(--a)}.d.B{border-left:5px solid var(--b)}
+.d h2{margin:0 0 6px;font-size:17px}.d small{color:var(--mut)}
+h2.s{margin:26px 0 8px}
+.wk{background:var(--card);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.wk.fin{outline:2px solid var(--a)}
+.wk h4{margin:0 0 6px}.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:4px 14px}
+.g span{display:flex;justify-content:space-between;gap:8px}.g b.A{color:var(--a)}.g b.B{color:var(--b)}
+.sc{color:var(--mut);font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse}td,th{padding:4px 6px;text-align:left}th{color:var(--mut);font-weight:500}
+.tw{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.divs,.tw{grid-template-columns:1fr}}
+.q .t.e{cursor:pointer;border-radius:6px;padding:5px 8px;margin:2px 0;background:#232c45;touch-action:manipulation}.q .t.e:hover{background:#2c3858}.q .t.sel{background:var(--a);color:#111;font-weight:700}.q h3 .ren{cursor:pointer;text-decoration:underline dotted}.hint{background:var(--card);border:1px dashed var(--a);border-radius:10px;padding:8px 12px;margin:0 0 10px;text-align:center;color:var(--mut)}
+.g b.N{color:var(--mut)}.g i{font-style:normal;color:var(--mut);font-size:12px}.wk.nc{outline:1px dashed #4a5578}
+
+.fmt{background:var(--card);border-radius:14px;padding:14px;margin-top:18px}.fmt h2{margin:0 0 2px;font-size:17px;text-align:center}.fmt .sub{color:var(--mut);text-align:center;font-size:13px;margin-bottom:12px}
+.strip{display:grid;grid-template-columns:repeat(12,1fr);gap:6px}
+.blk{border-radius:9px;padding:8px 1px;text-align:center;color:#111;font-weight:700;font-size:10.5px;line-height:1.25}.blk b{display:block;font-size:18px}.blk span{display:block;font-weight:600;font-size:10.5px}
+.k-p4{background:#c7a6ff}.k-nc{background:#8793ad}.k-in{background:var(--a)}.k-x{background:#4cc3ff}.k-f{background:#fff;box-shadow:0 0 0 2px var(--b)}
+.brace{display:grid;grid-template-columns:3fr 7fr 2fr;gap:6px;margin-top:6px;text-align:center;font-size:12px;color:var(--mut)}.brace div{border-top:3px solid;padding-top:4px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;margin-top:10px;font-size:13px}.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+@media(max-width:640px){.strip{grid-template-columns:repeat(6,1fr)}.brace{display:none}}
+.tgt{outline:2px dashed var(--a);outline-offset:-2px}.chip.e{display:inline-block;cursor:pointer;margin:4px 5px 0 0;padding:5px 10px;border-radius:7px;background:#232c45;touch-action:manipulation}.chip.e:hover{background:#2c3858}.chip.sel{background:var(--a);color:#111;font-weight:700}
+.bar button#edit{border:2px solid var(--a);font-weight:700}.bar button#edit.on{background:var(--a);color:#111}.q .t.e::after{content:"\21C4";float:right;color:var(--mut)}.q .t.sel::after{color:#111}.chip.e::after{content:" \21C4";color:var(--mut)}.chip.sel::after{color:#111}.hint{border-style:solid;border-width:2px}
+.pv,.pe{width:100%;border-collapse:collapse}.pv td{padding:7px 6px;border-top:1px solid #2c3858}.pv td.vs{text-align:center;color:var(--mut)}.pv tr.ch td{background:#232c45}.pv small{color:var(--mut)}.pv b.A{color:var(--a)}.pv b.B{color:var(--b)}.pe input{width:46px;background:#0f1420;color:var(--ink);border:1px solid #2c3858;border-radius:6px;padding:4px;font:inherit;text-align:center}.pe td,.pe th{padding:3px 4px}
+.note{color:var(--mut);font-size:13px;text-align:center}
+.tabs button.p{background:var(--a);color:#111;font-weight:700;border:0}
+.tbcard{background:var(--card);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.tbcard h3{margin:0 0 4px;font-size:16px}
+.tbcard .sub2{color:var(--mut);font-size:13px;margin-bottom:8px}
+.step{display:flex;gap:10px;padding:8px 0;border-top:1px solid #2c3858}
+.step.first{border-top:0}
+.ltr{flex:0 0 26px;height:26px;border-radius:7px;background:var(--a);color:#111;font-weight:700;display:flex;align-items:center;justify-content:center}
+.step p{margin:0}
+.step small{color:var(--mut);display:block;margin-top:2px}
+.tbnote{color:var(--mut);font-size:13px}
+.tbcard a{color:var(--b)}
+.tbflow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:8px}
+.tbf{background:#232c45;border-radius:9px;padding:9px 10px;font-size:13px;text-align:center}
+.tbf b{display:block;margin-bottom:3px}
+.tgrow{padding:2px 0}
+.gw{cursor:pointer;padding:3px 8px;border-radius:6px;display:inline-block;touch-action:manipulation}
+.gw:hover{background:#2c3858}
+.gw.sel{background:var(--a);color:#111;font-weight:700}
+.gw.sel:hover{background:var(--a)}
+.gline{padding:2px 0}
+.gdate{color:var(--mut);font-size:13px;margin:10px 0 2px;border-top:1px solid #2c3858;padding-top:8px}
+.tgreason{color:var(--mut);font-size:13px;padding:0 0 6px 18px}
+.xl{background:var(--card);color:var(--ink);border:1px solid #2c3858;border-radius:9px;padding:10px 14px;font:inherit;text-decoration:none;display:inline-block}.xl:hover{filter:brightness(1.15)}
+
+</style></head><body>
+<header><h1>Big 12 Standings &amp; Scenarios</h1><p>Live standings, a rest-of-season simulator, what-if and run-scenario tools, and the official tiebreakers. Mock schedule builder lives on the sister site.</p></header>
+<main>
+<div class="bar tabs">
+<a class="xl" href="https://pouchman27.github.io/big12-scheduler/">&#8592; Mock Scheduler</a>
+<button class="p" id="tabReal">Real Big 12</button>
+<button id="tabSim">Simulator</button>
+<button id="tabWhat">What-if</button>
+<button id="tabRun">Run scenario</button>
+<button id="tabTB">Tiebreakers</button>
+</div>
+<div id="realView">
+<div class="tbcard"><h3>Real 2026 Big 12 standings</h3>
+<div class="sub2" id="realSrc">Snapshot as of Oct 18, 2026 - conference games set the championship race. Source: <a href="https://www.ncaa.com/standings/football/fbs/big-12" target="_blank" rel="noopener">NCAA.com standings</a>.</div>
+<table id="realTable"><tr><th>#</th><th>Team</th><th>Conf</th><th>Overall</th></tr><tr><td>1</td><td>Utah</td><td>3-0</td><td>6-0</td></tr><tr><td>2</td><td>Texas Tech</td><td>3-0</td><td>6-0</td></tr><tr><td>3</td><td>BYU</td><td>3-0</td><td>6-0</td></tr><tr><td>4</td><td>Houston</td><td>3-1</td><td>6-1</td></tr><tr><td>5</td><td>Arizona</td><td>2-1</td><td>5-1</td></tr><tr><td>6</td><td>Oklahoma State</td><td>2-1</td><td>4-2</td></tr><tr><td>7</td><td>Baylor</td><td>2-1</td><td>4-2</td></tr><tr><td>8</td><td>Kansas State</td><td>1-2</td><td>4-2</td></tr><tr><td>9</td><td>Cincinnati</td><td>1-2</td><td>4-2</td></tr><tr><td>10</td><td>UCF</td><td>1-2</td><td>3-3</td></tr><tr><td>11</td><td>Arizona State</td><td>1-2</td><td>3-3</td></tr><tr><td>12</td><td>Iowa State</td><td>1-2</td><td>3-3</td></tr><tr><td>13</td><td>TCU</td><td>1-2</td><td>3-3</td></tr><tr><td>14</td><td>West Virginia</td><td>1-3</td><td>4-3</td></tr><tr><td>15</td><td>Kansas</td><td>0-3</td><td>2-4</td></tr><tr><td>16</td><td>Colorado</td><td>0-3</td><td>2-4</td></tr></table></div>
+<div id="tbNow"></div>
+<div class="tbcard"><h3>Championship race as of Oct 20</h3>
+<p>Three teams are perfect in conference play at 3-0 - <b>BYU</b>, <b>Texas Tech</b> and <b>Utah</b> - with <b>Houston</b> one game back at 3-1. If any two of the 3-0 teams finish tied, the tiebreakers kick in: head-to-head first (BYU still plays at Utah on Nov 7, so that game could decide a top seed directly), then common opponents, then the walk down the standings. See the Tiebreakers tab for the full official order.</p>
+<p class="tbnote" style="margin-top:8px">Schedules sourced from <a href="https://cfb.app/big12/rankings" target="_blank" rel="noopener">cfb.app</a> and NCAA.com; this snapshot does not update itself, so treat it as a point-in-time view, not a live tracker.</p></div>
+</div>
+<div id="simView" style="display:none">
+<div class="tbcard"><h3>Rest-of-season simulator</h3>
+<div class="sub2" id="simSrc">Loading data...</div>
+<div class="bar" style="justify-content:flex-start;margin:8px 0">
+<select id="metric">
+<option value="fpi">ESPN FPI</option>
+<option value="elo">Elo-style (from 2026 results)</option>
+<option value="flip">Coin flip (50/50)</option>
+</select>
+<button class="p" id="runsim">Simulate 2,000 seasons</button>
+</div>
+<div class="tbnote" id="metricNote"></div>
+<div id="simOut"></div>
+</div>
+</div>
+<div id="whatView" style="display:none">
+<div class="tbcard"><h3>Single-season what-if simulator</h3>
+<div class="sub2">Every conference game, real results included. Tap a team to set or flip the winner - the standings and the official tiebreakers update live. Remaining games you don't pick simply don't count.</div>
+<div class="bar" style="justify-content:flex-start;margin:8px 0">
+<select id="wMetric"><option value="fpi">ESPN FPI</option><option value="elo">Elo-style (from 2026 results)</option><option value="flip">Coin flip (50/50)</option></select>
+<button id="wAuto">Auto-pick remaining favorites</button>
+<button id="wReset">Reset to real results</button>
+<button id="wShare">Copy scenario link</button>
+</div>
+<div id="wGames"></div>
+<div id="wStand"></div>
+<div id="wTb"></div>
+</div>
+</div>
+<div id="runView" style="display:none">
+<div class="tbcard"><h3>Run scenario - full-season projection</h3>
+<div class="sub2">One click picks the favorite in every remaining game and projects the final 12-game standings with the official tiebreakers applied. Every non-conference game is already in the books, so the Overall column is a true final record. Tap any predicted game to flip it - the standings and reasons update live.</div>
+<div class="bar" style="justify-content:flex-start;margin:8px 0">
+<select id="rMetric"><option value="fpi">ESPN FPI</option><option value="elo">Elo-style (from 2026 results)</option><option value="flip">Coin flip (50/50)</option></select>
+<button id="rRun">Run full season</button>
+<button id="rReset">Reset picks</button>
+</div>
+<div id="rOut"></div>
+<div id="rGames"></div>
+<div id="rStand"></div>
+<div id="rTb"></div>
+</div>
+</div>
+<div id="tbView" style="display:none">
+<div class="tbcard"><h3>How the Big 12 picks its championship teams</h3>
+<p>With 16 teams and no round-robin, the Big 12 seeds the <b>two teams with the best conference winning percentage</b> into the championship game. The winner is the conference's automatic qualifier (AQ) to the College Football Playoff. When two or more teams tie for first or second place, the tiebreakers below decide it - in order, stopping as soon as one team has the edge.</p>
+<div class="tbflow">
+<div class="tbf"><b>Tie for 1st</b>Both tied teams are in. If they played, the head-to-head winner is the #1 seed. If they didn't play, run the two-team steps below to set the seeding.</div>
+<div class="tbf"><b>No tie for 1st, tie for 2nd</b>The tied teams run the two-team steps below. The winner is the #2 seed and goes to Arlington.</div>
+<div class="tbf"><b>3+ teams tied</b>Run the multiple-team steps. The moment one team gains the edge it is seeded, and the rest restart from step A. Down to two teams? Switch to the two-team steps.</div>
+</div></div>
+
+<div class="tbcard"><h3>Two-team tie</h3><div class="sub2">Applied in order until one team wins the tiebreak</div>
+<div class="step first"><div class="ltr">A</div><p><b>Head-to-head.</b><small>Winner of the game between the two tied teams takes the tiebreak.</small></p></div>
+<div class="step"><div class="ltr">B</div><p><b>Record vs common conference opponents.</b><small>Win percentage against every conference opponent both tied teams played.</small></p></div>
+<div class="step"><div class="ltr">C</div><p><b>Record vs the next-highest common opponent.</b><small>Start at the top of the standings and walk down: how did each tied team do against the best-placed common conference opponent? Keep going until it separates them. If the comparison opponent is itself a tied group, use the tied teams' combined record against that whole group, not against the individual teams.</small></p></div>
+<div class="step"><div class="ltr">D</div><p><b>Strength of conference schedule.</b><small>Combined conference win percentage of each tied team's conference opponents.</small></p></div>
+<div class="step"><div class="ltr">E</div><p><b>Total wins in the 12-game season.</b><small>Only one win against an FCS (or lower) team counts per season, and games exempt from the NCAA's maximum-contest rule don't count.</small></p></div>
+<div class="step"><div class="ltr">F</div><p><b>SportSource Analytics ranking.</b><small>Highest team Rating Score after the final regular-season weekend.</small></p></div>
+<div class="step"><div class="ltr">G</div><p><b>Coin toss.</b><small>Yes, really.</small></p></div></div>
+
+<div class="tbcard"><h3>Three or more teams tied</h3><div class="sub2">As soon as one team is seeded, the rest restart from step A; a tie reduced to two teams switches to the two-team list</div>
+<div class="step first"><div class="ltr">A</div><p><b>Record in games among the tied teams.</b><small>Mini-league win percentage. Two catches: (1) if the tied teams didn't all play each other but one team beat every other tied team, that team is seeded and the rest restart the process; (2) if they didn't all play each other and nobody swept the group, skip to step B.</small></p></div>
+<div class="step"><div class="ltr">B</div><p><b>Record vs common conference opponents.</b><small>Win percentage against conference opponents every tied team played.</small></p></div>
+<div class="step"><div class="ltr">C</div><p><b>Record vs the next-highest common opponent.</b><small>Same walk down the standings as the two-team step C, including the "treat a tied group as one combined opponent" rule.</small></p></div>
+<div class="step"><div class="ltr">D</div><p><b>Strength of conference schedule.</b><small>Combined conference win percentage of each tied team's conference opponents.</small></p></div>
+<div class="step"><div class="ltr">E</div><p><b>Total wins in the 12-game season.</b><small>Same fine print: one FCS win max, exempt games don't count.</small></p></div>
+<div class="step"><div class="ltr">F</div><p><b>SportSource Analytics ranking.</b><small>Highest team Rating Score after the final regular-season weekend.</small></p></div>
+<div class="step"><div class="ltr">G</div><p><b>Coin toss.</b></p></div></div>
+
+<div class="tbcard"><h3>Good to know</h3>
+<p class="tbnote">Only conference games count toward the standings that set the tie. Point differential and margin of victory are never used - if records and strength of schedule can't separate teams, it goes to the SportSource Analytics metric, then a literal coin toss.</p>
+<p class="tbnote" style="margin-top:8px">Source: <a href="https://big12sports.com/sports/2024/9/6/FB_0906243427.aspx?path=football" target="_blank" rel="noopener">Big 12 Football Championship Tiebreaker Policies</a> and the conference's official <a href="https://big12sports.com/documents/2025/11/4/Big_12_Football_2024_Tiebreaker_Policy.pdf" target="_blank" rel="noopener">16-team tiebreaker policy (PDF)</a>, in place since the 2024 season.</p></div>
+</div>
+
+</main>
+<script>
+const GEO=[["Mountain & Desert",["Arizona","Arizona State","Utah","BYU"]],
+["Texas",["Baylor","TCU","Houston","Texas Tech"]],
+["Plains",["Colorado","Kansas","Kansas State","Iowa State"]],
+["East & Sooner",["Oklahoma State","Cincinnati","UCF","West Virginia"]]];
+const PAIRS=[[[0,2],[1,3]],[[0,1],[2,3]],[[0,3],[1,2]]];
+const COL=["#e0a030","#d9534f","#5cb85c","#4cc3ff"];
+let Q=GEO.map(q=>({name:q[0],teams:q[1].slice()})),pairIdx=0,sched=null,scores=null,editing=false,picked=null;
+const KEY="big12-quadrants-v1",ALL=GEO.flatMap(q=>q[1]);
+function save(){try{localStorage.setItem(KEY,JSON.stringify({Q,pairIdx}))}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(!d||!Array.isArray(d.Q)||d.Q.length!=4)return;const flat=d.Q.flatMap(q=>q.teams);if(d.Q.some(q=>q.teams.length!=4)||flat.length!=16||ALL.some(t=>!flat.includes(t)))return;Q=d.Q.map(q=>({name:String(q.name).slice(0,30),teams:q.teams.slice()}));pairIdx=[0,1,2].includes(d.pairIdx)?d.pairIdx:0}catch(e){}}
+function swap(a,b){let ia,ta,ib,tb;Q.forEach((q,i)=>q.teams.forEach((t,j)=>{if(t==a){ia=i;ta=j}if(t==b){ib=i;tb=j}}));Q[ia].teams[ta]=b;Q[ib].teams[tb]=a}
+function pick(t){if(picked==null){picked=t;render();return}if(picked!=t){swap(picked,t);picked=null;save();fillSel();build();return}picked=null;render()}
+const $=id=>document.getElementById(id);
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const sel=$("pair");
+function names(){return PAIRS.map(p=>p.map(d=>d.map(i=>Q[i].name).join(" + ")).join("  vs  "))}
+function fillSel(){sel.innerHTML=names().map((n,i)=>`<option value="${i}">${n}</option>`).join("");sel.value=pairIdx}
+function divs(){return PAIRS[pairIdx].map(d=>d.flatMap(i=>Q[i].teams))}
+function rr(teams){ // circle method, shuffled rounds
+ let t=shuf(teams),n=t.length,rounds=[];
+ for(let r=0;r<n-1;r++){const g=[];for(let i=0;i<n/2;i++)g.push([t[i],t[n-1-i]]);rounds.push(g);t.splice(1,0,t.pop())}
+ return shuf(rounds)}
+const P4={"Alabama":"SEC","Georgia":"SEC","Texas":"SEC","Oklahoma":"SEC","LSU":"SEC","Tennessee":"SEC","Florida":"SEC","Auburn":"SEC","Ole Miss":"SEC","Texas A&M":"SEC","Ohio State":"Big Ten","Michigan":"Big Ten","Oregon":"Big Ten","USC":"Big Ten","Penn State":"Big Ten","Washington":"Big Ten","Wisconsin":"Big Ten","Nebraska":"Big Ten","UCLA":"Big Ten","Iowa":"Big Ten","Clemson":"ACC","Miami":"ACC","Florida State":"ACC","NC State":"ACC","Louisville":"ACC","Pitt":"ACC","Virginia Tech":"ACC","SMU":"ACC","Georgia Tech":"ACC","Stanford":"ACC"};
+const OTH={"Boise State":"MWC","Memphis":"AAC","Tulane":"AAC","Liberty":"CUSA","Navy":"AAC","Army":"AAC","App State":"Sun Belt","Fresno State":"MWC","UNLV":"MWC","James Madison":"Sun Belt","Toledo":"MAC","Ohio":"MAC","Troy":"Sun Belt","Utah State":"MWC","Wyoming":"MWC","Air Force":"MWC","San Diego State":"MWC","North Texas":"AAC","South Alabama":"Sun Belt","Western Kentucky":"CUSA","North Dakota State":"FCS","Sacramento State":"FCS","Montana":"FCS","Weber State":"FCS","Southern Utah":"FCS","Northern Iowa":"FCS","Idaho":"FCS","Tarleton State":"FCS"};
+const OPPC=Object.assign({},OTH,P4);
+function drawNC(teams){ // 3 non-conf weeks; each team gets 3 distinct opponents, at least 1 Power 4
+ const p4=Object.keys(P4),all=Object.keys(OTH),pw={},used={},wk=[[],[],[]];
+ teams.forEach(t=>{pw[t]=Math.random()*3|0;used[t]=new Set()});
+ for(let w=0;w<3;w++){const taken=new Set();
+  shuf(teams).forEach(t=>{const pool=shuf(pw[t]==w?p4:all).filter(o=>!taken.has(o)&&!used[t].has(o));const o=pool[0];taken.add(o);used[t].add(o);wk[w].push([t,o])})}
+ return wk}
+function build(){
+ const [A,B]=divs(),ra=rr(A),rb=rr(B),weeks=[];
+ drawNC([...A,...B]).forEach(g=>weeks.push({nc:true,games:g}));
+ const dw=[];for(let w=0;w<7;w++)dw.push({games:[...ra[w],...rb[w]]});
+ const b1=shuf(B),sa=shuf(A);
+ weeks.push(...dw.slice(0,3));
+ weeks.push({x:true,games:sa.map((a,i)=>[a,b1[i]])});
+ weeks.push(...dw.slice(3));
+ weeks.push({fin:true,games:[]});
+ sched=weeks;scores=null;render()}
+function dv(t){return /^[AB]\d$/.test(t)?t[0]:OPPC[t]?"N":divs()[0].includes(t)?"A":"B"}
+function bindT(){document.querySelectorAll(".t.e").forEach(el=>{const t=el.dataset.t;el.onclick=()=>pick(t);el.ondragstart=e=>{e.dataTransfer.setData("text/plain",t)};el.ondragover=e=>e.preventDefault();el.ondrop=e=>{e.preventDefault();const f=e.dataTransfer.getData("text/plain");if(f&&f!=t){swap(f,t);picked=null;save();fillSel();build()}}})}
+const PORDER=["Texas Tech","BYU","Utah","Houston","Arizona","Arizona State","TCU","Iowa State","Cincinnati","Kansas State","Baylor","Kansas","UCF","West Virginia","Colorado","Oklahoma State"];
+const PDEF={"Texas Tech":[8,1,12,2],"BYU":[8,1,12,2],"Utah":[7,2,11,2],"Houston":[6,3,10,3],"Arizona":[6,3,9,4],"Arizona State":[6,3,8,5],"TCU":[5,4,9,4],"Iowa State":[5,4,8,4],"Cincinnati":[5,4,7,6],"Kansas State":[5,4,6,6],"Baylor":[3,6,5,7],"Kansas":[3,6,5,7],"UCF":[2,7,5,7],"West Virginia":[2,7,4,8],"Colorado":[1,8,3,9],"Oklahoma State":[0,9,1,11]};
+const PKEY="big12-prev-v1";
+let PREV=JSON.parse(JSON.stringify(PDEF));
+try{const d=JSON.parse(localStorage.getItem(PKEY));if(d&&PORDER.every(t=>Array.isArray(d[t])&&d[t].length==4&&d[t].every(n=>Number.isFinite(n)&&n>=0)))PREV=d}catch(e){}
+const savePrev=()=>{try{localStorage.setItem(PKEY,JSON.stringify(PREV))}catch(e){}};
+function rankPrev(d){return d.slice().sort((x,y)=>PREV[y][0]-PREV[x][0]||PREV[x][1]-PREV[y][1]||PREV[y][2]-PREV[x][2]||PORDER.indexOf(x)-PORDER.indexOf(y))}
+function xGames(){const[A,B]=divs(),ra=rankPrev(A),rb=rankPrev(B);return ra.map((a,i)=>[a,rb[i]])}
+function gamesOf(w){return w.fin?finGames():w.x?xGames():w.games}
+function seedView(){const[A,B]=divs();if(scores&&scores[0]){const rec=records(),ra=ranked(A,rec),rb=ranked(B,rec),f=t=>rec[t].w+"-"+rec[t].l;return{ra,rb,fa:f,fb:f,src:"Simulated Weeks 1-11 standings"}}const f=t=>PREV[t][0]+"-"+PREV[t][1]+" ("+PREV[t][2]+"-"+PREV[t][3]+")";return{ra:rankPrev(A),rb:rankPrev(B),fa:f,fb:f,src:"2025 records (stand-in until you hit Simulate scores)"}}
+function previewHTML(){const v=seedView();return `<div class="fmt"><h2>Championship week preview</h2><div class="sub">Standings next to the projected Week 12 matchups (1 v 1, 2 v 2...). Source: ${v.src}.</div><table class="pv"><tr><th>Seed</th><th>Division A</th><th></th><th>Division B</th></tr>${v.ra.map((a,i)=>`<tr${i==0?' class="ch"':""}><td>${i+1}</td><td><b class="A">${a}</b> <small>${v.fa(a)}</small></td><td class="vs">${i==0?"&#127942; Championship":"vs"}</td><td><b class="B">${v.rb[i]}</b> <small>${v.fb(v.rb[i])}</small></td></tr>`).join("")}</table></div>`}
+function prevHTML(){const[A,B]=divs();const box=(d,k)=>`<div class="d ${k}"><h2>Division ${k}</h2><table class="pe"><tr><th>#</th><th>Team</th><th>Conf W</th><th>Conf L</th><th>All W</th><th>All L</th></tr>${rankPrev(d).map((t,i)=>`<tr><td>${i+1}</td><td>${t}</td>${[0,1,2,3].map(j=>`<td><input type="number" min="0" max="20" value="${PREV[t][j]}" data-pt="${t}" data-pj="${j}"></td>`).join("")}</tr>`).join("")}</table></div>`;return `<div class="fmt"><h2>Previous season records (2025)</h2><div class="sub">Set the Week 7 crossover: previous rank A1 v B1, A2 v B2... Defaults are the real 2025 Big 12 standings (<a style="color:var(--b)" href="https://en.wikipedia.org/wiki/2025_Big_12_Conference_football_season" target="_blank" rel="noopener">Wikipedia</a>). Edit any number to run a what-if (this clears simulated scores). Ranked by conference wins, then overall wins.</div><div class="tw">${box(A,"A")}${box(B,"B")}</div><div style="text-align:center;margin-top:10px"><button id="prevreset">Reset to actual 2025</button></div></div>`}
+function bindPrev(){document.querySelectorAll("input[data-pt]").forEach(el=>{el.onchange=()=>{const v=Math.max(0,Math.min(20,Math.floor(+el.value)||0));PREV[el.dataset.pt][+el.dataset.pj]=v;savePrev();scores=null;render();const n=document.querySelector(`input[data-pt="${el.dataset.pt}"][data-pj="${el.dataset.pj}"]`);if(n)n.focus()}});const r=$("prevreset");if(r)r.onclick=()=>{PREV=JSON.parse(JSON.stringify(PDEF));savePrev();scores=null;render()}}
+const tg=t=>picked&&picked!=t&&dv(picked)!=dv(t);
+function render(){
+ if(window.__q)return;
+ $("hint").innerHTML=editing?`<div class="hint">Editing quadrants and divisions: tap a team (in a quadrant or in a division box), then tap a team in the OTHER division to trade divisions with it - each moves into the other's quadrant, so divisions stay 8 and 8. Tapping a team in the same division just swaps their quadrants. Drag-onto-another works too. Tap a quadrant name to rename it. Every quadrant always keeps 4 teams. Changes save automatically.${picked?`<br><b style="color:var(--a)">Moving ${picked} from Division ${dv(picked)} to Division ${dv(picked)=="A"?"B":"A"}: tap the dashed Division ${dv(picked)=="A"?"B":"A"} team that comes back to Division ${dv(picked)} in exchange.</b>`:""}</div>`:"";
+ $("edit").textContent=editing?"Done swapping":"Swap teams / edit quadrants";$("edit").classList.toggle("on",editing);
+ $("quads").innerHTML=Q.map((q,i)=>`<div class="q" style="border-top-color:${COL[i]}"><h3>${editing?`<span class="ren" data-q="${i}">${q.name}</span>`:q.name}</h3>${q.teams.map(t=>`<div class="t${editing?" e":""}${picked==t?" sel":""}${tg(t)?" tgt":""}" ${editing?`data-t="${t}" draggable="true"`:""}>${t}</div>`).join("")}</div>`).join("");
+ if(editing){document.querySelectorAll(".t.e").forEach(el=>{const t=el.dataset.t;el.onclick=()=>pick(t);el.ondragstart=e=>{e.dataTransfer.setData("text/plain",t)};el.ondragover=e=>e.preventDefault();el.ondrop=e=>{e.preventDefault();const f=e.dataTransfer.getData("text/plain");if(f&&f!=t){swap(f,t);picked=null;save();fillSel();build()}}});
+  document.querySelectorAll(".ren").forEach(el=>el.onclick=()=>{const i=+el.dataset.q,n=prompt("Quadrant name",Q[i].name);if(n&&n.trim()){Q[i].name=n.trim().slice(0,30);save();fillSel();render()}})}
+ const [A,B]=divs(),nm=names()[pairIdx].split("  vs  ");
+ $("divs").innerHTML=[["A",A,nm[0]],["B",B,nm[1]]].map(([k,d,n])=>`<div class="d ${k}"><h2>Division ${k}</h2><small>${n}</small><div style="margin-top:6px">${editing?d.map(t=>`<span class="t e chip${picked==t?" sel":""}${tg(t)?" tgt":""}" data-t="${t}" draggable="true">${t}</span>`).join(""):d.join(", ")}</div></div>`).join("");
+ if(editing)bindT();
+ $("preview").innerHTML=previewHTML();$("prevbox").innerHTML=prevHTML();bindPrev();
+ if(!sched)build0();
+ $("weeks").innerHTML=sched.map((w,wi)=>{const GM=gamesOf(w);return `<div class="wk ${w.fin?"fin":""} ${w.nc?"nc":""}"><h4>Week ${wi+1}${w.nc?" - Non-conference (each team: 1 Power 4 + 2 non-Power 4 across Weeks 1-3)":w.x?" - Mid-season crossover vs other division, seeded by 2025 record (A1 v B1, A2 v B2...)":w.fin?" - Conference Championship week (seeded by standings, 1 v 1, 2 v 2...)":" - In-division"}</h4><div class="g">${GM.map((g,gi)=>{const s=scores&&scores[wi]&&scores[wi][gi];return `<span><span>${w.fin&&gi==0?"&#127942; ":""}<b class="${dv(g[0])}">${g[0]}</b> vs <b class="${dv(g[1])}">${g[1]}</b>${OPPC[g[1]]?` <i>${P4[g[1]]?"&#9733; ":""}(${OPPC[g[1]]})</i>`:""}</span><span class="sc">${s?s[0]+"-"+s[1]:w.fin&&gi==0?"Championship":""}</span></span>`}).join("")}</div>${w.fin&&scores?champ():""}</div>`}).join("");
+ $("stand").innerHTML=scores?standings():""}
+function build0(){build()}
+function rnd(){let a=3+(Math.random()*8|0)*3+(Math.random()*3|0),b=3+(Math.random()*8|0)*3+(Math.random()*3|0);if(a==b)a+=3;return[a,b]}
+function records(){const rec={};divs().flat().forEach(t=>rec[t]={w:0,l:0,pf:0,pa:0});
+ sched.forEach((w,wi)=>{if(w.fin)return;gamesOf(w).forEach((g,gi)=>{const[s1,s2]=scores[wi][gi];const a=rec[g[0]],b=rec[g[1]];a.pf+=s1;a.pa+=s2;if(b){b.pf+=s2;b.pa+=s1}if(s1>s2){a.w++;b&&b.l++}else{a.l++;b&&b.w++}})});return rec}
+function ranked(d,rec){return d.slice().sort((x,y)=>rec[y].w-rec[x].w||(rec[y].pf-rec[y].pa)-(rec[x].pf-rec[x].pa))}
+function finGames(){const[A,B]=divs();if(!scores||!scores[0]){return A.map((_,i)=>["A"+(i+1),"B"+(i+1)])}const rec=records(),ra=ranked(A,rec),rb=ranked(B,rec);return ra.map((a,i)=>[a,rb[i]])}
+function champ(){const g=finGames()[0],s=scores[sched.length-1][0];return `<p style="margin:8px 0 0;font-weight:700;color:var(--a)">&#127942; Conference champion: ${s[0]>s[1]?g[0]:g[1]}</p>`}
+function simulate(){scores=sched.map(w=>w.fin?[]:gamesOf(w).map(rnd));scores[sched.length-1]=finGames().map(rnd);render()}
+function standings(){
+ const rec=records();
+ const tbl=(d,k)=>`<table><tr><th>Seed</th><th>Team</th><th>W-L</th><th>PF-PA</th></tr>${ranked(d,rec).map((t,i)=>`<tr><td>${k}${i+1}</td><td>${t}</td><td>${rec[t].w}-${rec[t].l}</td><td>${rec[t].pf}-${rec[t].pa}</td></tr>`).join("")}</table>`;
+ const [A,B]=divs();
+ return `<h2 class="s">Simulated standings (Weeks 1-11) - these set the Week 12 seeds</h2><div class="tw"><div class="d A"><h2>Division A</h2>${tbl(A,"A")}</div><div class="d B"><h2>Division B</h2>${tbl(B,"B")}</div></div>`}
+$("sched").onclick=build;
+$("sim").onclick=()=>{if(!sched)build();simulate()};
+$("geo").onclick=()=>{Q=GEO.map(q=>({name:q[0],teams:q[1].slice()}));picked=null;save();fillSel();build()};
+$("edit").onclick=()=>{editing=!editing;picked=null;render()};
+$("redraw").onclick=()=>{const all=shuf(GEO.flatMap(q=>q[1]));Q=Q.map((q,i)=>({name:"Quadrant "+(i+1),teams:all.slice(i*4,i*4+4)}));picked=null;save();fillSel();build()};
+sel.onchange=()=>{pairIdx=+sel.value;save();build()};
+
+
+function showTab(v){$("schedView").style.display=v=="s"?"":"none";$("realView").style.display=v=="r"?"":"none";$("simView").style.display=v=="i"?"":"none";$("whatView").style.display=v=="w"?"":"none";$("runView").style.display=v=="n"?"":"none";$("tbView").style.display=v=="t"?"":"none";$("tabSched").classList.toggle("p",v=="s");$("tabReal").classList.toggle("p",v=="r");$("tabSim").classList.toggle("p",v=="i");$("tabWhat").classList.toggle("p",v=="w");$("tabRun").classList.toggle("p",v=="n");$("tabTB").classList.toggle("p",v=="t");if(v=="w")renderWhatif();if(v=="n")renderRun()}
+//$("tabSched") lives on the scheduler site
+$("tabReal").onclick=()=>showTab("r");$("tabSim").onclick=()=>showTab("i");$("tabWhat").onclick=()=>showTab("w");$("tabRun").onclick=()=>showTab("n");$("tabTB").onclick=()=>showTab("t");
+$("share").onclick=()=>{const d=JSON.stringify({Q,pairIdx});const u=location.origin+location.pathname+"#"+btoa(unescape(encodeURIComponent(d)));const done=()=>{$("share").textContent="Link copied";setTimeout(()=>$("share").textContent="Copy share link",1500)};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(done,()=>prompt("Share link:",u));else prompt("Share link:",u)};
+function loadHash(){try{const h=location.hash.slice(1);if(!h)return;const d=JSON.parse(decodeURIComponent(escape(atob(h))));if(!d||!Array.isArray(d.Q)||d.Q.length!=4)return;const flat=d.Q.flatMap(q=>q.teams);if(d.Q.some(q=>q.teams.length!=4)||flat.length!=16||ALL.some(t=>!flat.includes(t)))return;Q=d.Q.map(q=>({name:String(q.name).slice(0,30),teams:q.teams.slice()}));pairIdx=[0,1,2].includes(d.pairIdx)?d.pairIdx:0;save()}catch(e){}}
+$("simmany").onclick=()=>{
+ const K=200,titles={},runner={},app={};
+ window.__q=true;
+ for(let i=0;i<K;i++){build();simulate();const rec=records(),[A,B]=divs(),ra=ranked(A,rec),rb=ranked(B,rec);
+  const g=finGames()[0],s=scores[sched.length-1][0];const champTeam=s[0]>s[1]?g[0]:g[1];
+  titles[champTeam]=(titles[champTeam]||0)+1;[g[0],g[1]].forEach(t=>app[t]=(app[t]||0)+1)}
+ window.__q=false;build();
+ const teams=Object.keys(app).sort((x,y)=>(titles[y]||0)-(titles[x]||0)||(app[y]-app[x]));
+ $("odds").innerHTML=`<h2 class="s">Mock title odds - ${K} random seasons, random scores</h2><div class="tbcard"><div class="sub2">Purely for fun: schedules and scores are random, so this says more about the format than the teams. Division mates can never meet in the title game by design.</div><table><tr><th>Team</th><th>Title game apps</th><th>Championships</th><th>Title %</th></tr>${teams.map(t=>`<tr><td>${t}</td><td>${app[t]}/${K}</td><td>${titles[t]||0}/${K}</td><td>${Math.round(100*(titles[t]||0)/K)}%</td></tr>`).join("")}</table></div>`;
+ $("odds").scrollIntoView({behavior:"smooth"})};
+const IDM={"12": "Arizona", "197": "Oklahoma State", "2116": "UCF", "2132": "Cincinnati", "2305": "Kansas", "2306": "Kansas State", "239": "Baylor", "248": "Houston", "252": "BYU", "254": "Utah", "2628": "TCU", "2641": "Texas Tech", "277": "West Virginia", "38": "Colorado", "66": "Iowa State", "9": "Arizona State"};
+const REC_SNAP={"Arizona": [2, 1, 5, 1], "Arizona State": [1, 2, 3, 3], "BYU": [3, 0, 6, 0], "Baylor": [2, 1, 4, 2], "Cincinnati": [1, 2, 4, 2], "Colorado": [0, 3, 2, 4], "Houston": [3, 1, 6, 1], "Iowa State": [1, 2, 3, 3], "Kansas": [0, 3, 2, 4], "Kansas State": [1, 2, 4, 2], "Oklahoma State": [2, 1, 4, 2], "TCU": [1, 2, 3, 3], "Texas Tech": [3, 0, 6, 0], "UCF": [1, 2, 3, 3], "Utah": [3, 0, 6, 0], "West Virginia": [1, 3, 4, 3]};
+const REM_SNAP=[["Texas Tech", "Cincinnati", "2026-10-24"], ["West Virginia", "TCU", "2026-10-24"], ["Baylor", "Kansas", "2026-10-24"], ["BYU", "UCF", "2026-10-24"], ["Kansas State", "Arizona State", "2026-10-24"], ["Colorado", "Oklahoma State", "2026-10-24"], ["Iowa State", "Arizona", "2026-10-24"], ["Houston", "Utah", "2026-10-25"], ["Baylor", "UCF", "2026-10-30"], ["Arizona", "Texas Tech", "2026-10-31"], ["Kansas State", "Colorado", "2026-10-31"], ["Arizona State", "BYU", "2026-10-31"], ["Kansas", "TCU", "2026-10-31"], ["Utah", "Cincinnati", "2026-10-31"], ["Oklahoma State", "Iowa State", "2026-10-31"], ["TCU", "Arizona", "2026-11-07"], ["BYU", "Utah", "2026-11-07"], ["West Virginia", "Texas Tech", "2026-11-07"], ["Cincinnati", "Houston", "2026-11-07"], ["UCF", "Kansas", "2026-11-07"], ["Colorado", "Arizona State", "2026-11-07"], ["Iowa State", "Baylor", "2026-11-07"], ["Oklahoma State", "Kansas State", "2026-11-07"], ["Houston", "Colorado", "2026-11-14"], ["Baylor", "BYU", "2026-11-14"], ["Texas Tech", "Oklahoma State", "2026-11-14"], ["Utah", "Arizona", "2026-11-14"], ["Arizona State", "UCF", "2026-11-14"], ["Cincinnati", "Iowa State", "2026-11-14"], ["Kansas", "West Virginia", "2026-11-14"], ["Kansas State", "TCU", "2026-11-14"], ["Iowa State", "UCF", "2026-11-20"], ["BYU", "Kansas", "2026-11-21"], ["Texas Tech", "Baylor", "2026-11-21"], ["Utah", "TCU", "2026-11-21"], ["Houston", "West Virginia", "2026-11-21"], ["Arizona", "Kansas State", "2026-11-21"], ["Colorado", "Cincinnati", "2026-11-21"], ["Oklahoma State", "Arizona State", "2026-11-21"], ["TCU", "Texas Tech", "2026-11-27"], ["West Virginia", "Utah", "2026-11-28"], ["Cincinnati", "BYU", "2026-11-28"], ["Baylor", "Houston", "2026-11-28"], ["Arizona State", "Arizona", "2026-11-28"], ["UCF", "Colorado", "2026-11-28"], ["Kansas", "Oklahoma State", "2026-11-28"], ["Kansas State", "Iowa State", "2026-11-28"]];
+const DONE_SNAP=[["Arizona", "BYU", 17, 28, "2026-09-12"], ["Houston", "Texas Tech", 26, 28, "2026-09-19"], ["Arizona State", "Kansas", 24, 17, "2026-09-19"], ["Colorado", "Baylor", 13, 23, "2026-09-26"], ["Utah", "Iowa State", 31, 17, "2026-09-26"], ["TCU", "UCF", 13, 21, "2026-09-26"], ["Kansas State", "Cincinnati", 26, 31, "2026-09-26"], ["Oklahoma State", "West Virginia", 41, 24, "2026-09-26"], ["UCF", "Houston", 17, 27, "2026-10-03"], ["West Virginia", "Iowa State", 42, 45, "2026-10-03"], ["BYU", "TCU", 17, 10, "2026-10-03"], ["Texas Tech", "Colorado", 29, 7, "2026-10-03"], ["Baylor", "Arizona State", 55, 19, "2026-10-04"], ["Cincinnati", "Arizona", 7, 34, "2026-10-04"], ["Iowa State", "BYU", 10, 24, "2026-10-10"], ["UCF", "Oklahoma State", 28, 42, "2026-10-10"], ["Arizona", "West Virginia", 52, 31, "2026-10-10"], ["Houston", "Kansas State", 35, 16, "2026-10-10"], ["Kansas", "Utah", 24, 41, "2026-10-11"], ["Cincinnati", "West Virginia", 42, 45, "2026-10-17"], ["Kansas", "Kansas State", 24, 35, "2026-10-17"], ["Arizona State", "Texas Tech", 25, 53, "2026-10-17"], ["TCU", "Baylor", 17, 6, "2026-10-17"], ["Oklahoma State", "Houston", 32, 35, "2026-10-17"], ["Utah", "Colorado", 27, 24, "2026-10-18"]];
+const ALLG_SNAP=[["2628", "153", 10, 15], ["2116", "2065", 73, 6], ["59", "38", 13, 14], ["254", "70", 66, 14], ["2305", "2341", 51, 6], ["248", "204", 33, 20], ["277", "324", 31, 24], ["66", "2546", 38, 10], ["2", "239", 17, 16], ["2132", "103", 34, 15], ["202", "197", 24, 10], ["2641", "2000", 33, 10], ["2306", "2447", 71, 3], ["252", "3101", 63, 7], ["12", "2464", 35, 7], ["9", "2415", 70, 7], ["2305", "142", 21, 38], ["245", "9", 48, 20], ["2306", "265", 34, 7], ["277", "2630", 52, 7], ["197", "2483", 39, 31], ["252", "12", 28, 17], ["38", "2692", 52, 21], ["221", "2116", 12, 7], ["248", "2582", 77, 6], ["2132", "2717", 62, 10], ["204", "2641", 24, 35], ["2294", "66", 16, 13], ["2628", "2755", 63, 7], ["239", "2504", 44, 3], ["254", "8", 43, 10], ["2641", "248", 28, 26], ["2306", "2655", 31, 20], ["66", "189", 55, 7], ["2305", "9", 17, 24], ["254", "328", 33, 0], ["2132", "193", 35, 31], ["239", "2348", 36, 19], ["2116", "2247", 44, 30], ["197", "93", 59, 0], ["258", "277", 27, 38], ["77", "38", 41, 7], ["2628", "2032", 31, 7], ["36", "252", 23, 41], ["12", "2459", 42, 17], ["2641", "2534", 49, 14], ["239", "38", 23, 13], ["66", "254", 17, 31], ["2116", "2628", 21, 13], ["290", "248", 28, 42], ["2132", "2306", 31, 26], ["277", "197", 24, 41], ["265", "12", 24, 34], ["248", "2116", 27, 17], ["2305", "2393", 55, 0], ["66", "277", 45, 42], ["2628", "252", 10, 17], ["38", "2641", 7, 29], ["9", "239", 19, 55], ["12", "2132", 34, 7], ["252", "66", 24, 10], ["197", "2116", 42, 28], ["277", "12", 31, 52], ["2306", "248", 16, 35], ["254", "2305", 41, 24], ["9", "62", 30, 12], ["277", "2132", 45, 42], ["2306", "2305", 35, 24], ["2641", "9", 53, 25], ["239", "2628", 6, 17], ["252", "87", 28, 24], ["248", "197", 35, 32], ["38", "254", 24, 27]];
+const FPI_SNAP={"Arizona": 10.5, "Arizona State": -1.3, "BYU": 17.4, "Baylor": 10.0, "Cincinnati": 3.5, "Colorado": 1.0, "Houston": 14.8, "Iowa State": 4.3, "Kansas": 3.7, "Kansas State": 7.6, "Oklahoma State": 9.0, "TCU": 8.6, "Texas Tech": 19.4, "UCF": 5.2, "Utah": 17.4, "West Virginia": 0.4};
+
+const B12T=Object.keys(REC_SNAP).sort();
+let SD={rec:REC_SNAP,rem:REM_SNAP,done:DONE_SNAP,allg:ALLG_SNAP,fpi:FPI_SNAP,live:false,fpiLive:false,fpiUpdated:"Oct 20, 2026"};
+function shortOf(id){return IDM[id]||null}
+function parseSeason(evts){
+ const rec={};B12T.forEach(t=>rec[t]=[0,0,0,0]);const rem=[],done=[],allg=[];
+ evts.filter(e=>e.season&&e.season.year==2026&&e.season.type==2).forEach(e=>{
+  const c=e.competitions[0],home=c.competitors.find(t=>t.homeAway=="home"),away=c.competitors.find(t=>t.homeAway=="away");
+  const h=shortOf(home.team.id),a=shortOf(away.team.id),conf=!!c.conferenceCompetition;
+  if(e.status.type.completed){
+   const hs=+home.score||0,as=+away.score||0;
+   if(h){rec[h][2]+=hs>as;rec[h][3]+=hs<as}if(a){rec[a][2]+=as>hs;rec[a][3]+=as<hs}
+   if(conf&&h&&a){rec[h][0]+=hs>as;rec[h][1]+=hs<as;rec[a][0]+=as>hs;rec[a][1]+=as<hs;done.push([a,h,as,hs,e.date.slice(0,10)])}
+   allg.push([home.team.id,away.team.id,hs,as]);
+  }else if(conf&&h&&a)rem.push([a,h,e.date.slice(0,10)]);
+ });return{rec,rem,done,allg}}
+async function loadSimData(){
+ try{
+  const [sb,fpi]=await Promise.all([
+   fetch("https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?groups=4&dates=2026&limit=400").then(r=>r.json()),
+   fetch("https://site.web.api.espn.com/apis/fitt/v3/sports/football/college-football/powerindex?region=us&lang=en&contentorigin=espn").then(r=>r.json())]);
+  const p=parseSeason(sb.events||[]);
+  if(p.done.length>=20&&p.rem.length>0){SD.rec=p.rec;SD.rem=p.rem;SD.done=p.done;SD.allg=p.allg;SD.live=true}
+  const fp={};(fpi.teams||[]).forEach(e=>{const t=shortOf(e.team.id);if(t)fp[t]=Math.round(e.categories[0].values[0]*10)/10});
+  if(Object.keys(fp).length==16){SD.fpi=fp;SD.fpiLive=true;SD.fpiUpdated=(fpi.lastUpdated||"").slice(0,10)||"latest"}
+ }catch(e){}
+ srcLine();
+}
+function srcLine(){
+ const s=SD.live?"LIVE from ESPN (standings, results and remaining schedule refresh on every visit)":"STATIC SNAPSHOT from Oct 20, 2026 (ESPN unreachable right now)";
+ const f=SD.fpiLive?"FPI also LIVE from ESPN (updated "+SD.fpiUpdated+")":"FPI is a STATIC SNAPSHOT from Oct 20, 2026";
+ $("simSrc").innerHTML=s+". "+f+".";
+ if($("realSrc")){
+  if(SD.live){$("realSrc").innerHTML="LIVE standings via ESPN, refreshed on every visit. Conference games set the championship race. Source: <a href='https://www.espn.com/college-football/standings' target='_blank' rel='noopener'>ESPN</a>.";
+   const rows=tieRankAll().map((t,i)=>`<tr><td>${i+1}</td><td>${t}</td><td>${SD.rec[t][0]}-${SD.rec[t][1]}</td><td>${SD.rec[t][2]}-${SD.rec[t][3]}</td></tr>`).join("");
+   $("realTable").innerHTML="<tr><th>#</th><th>Team</th><th>Conf</th><th>Overall</th></tr>"+rows;
+  } else {$("realSrc").innerHTML="STATIC SNAPSHOT as of Oct 18, 2026 (ESPN unreachable right now). Source: <a href='https://www.ncaa.com/standings/football/fbs/big-12' target='_blank' rel='noopener'>NCAA.com standings</a>."}
+ }
+ renderTieNow();
+ renderWhatif();
+ if(RS)renderRun();
+ metricNote();
+}
+function computeElo(games){
+ const E={},nm=id=>IDM[id]||id;
+ games.forEach(g=>{const H=nm(g[0]),A=nm(g[1]);if(E[H]==null)E[H]=1500;if(E[A]==null)E[A]=1500;
+  const p=1/(1+Math.pow(10,-(E[H]-E[A]+65)/400)),s=g[2]>g[3]?1:0,K=25;
+  E[H]+=K*(s-p);E[A]-=K*(s-p)});
+ B12T.forEach(t=>{if(E[t]==null)E[t]=1500});return E}
+function winProb(metric,h,a,neutral){
+ if(metric=="flip")return .5;
+ if(metric=="fpi"){const d=(SD.fpi[h]-SD.fpi[a])+(neutral?0:2.5);return 1/(1+Math.exp(-d/12))}
+ const d=(ELO[h]-ELO[a])+(neutral?0:65);return 1/(1+Math.pow(10,-d/400))}
+function metricNote(){
+ const m=$("metric").value;
+ $("metricNote").textContent=m=="fpi"?"Win probabilities come from ESPN's Football Power Index point ratings: logistic curve on the rating gap, +2.5 home-field points. Source: ESPN FPI ("+(SD.fpiLive?"live":"snapshot")+").":m=="elo"?"Elo-style ratings computed in your browser from actual 2026 results (all games involving Big 12 teams): everyone starts at 1500, K=25, +65 home-field points, standard 400-point win formula.":"Every remaining game is a 50/50 coin flip - the no-information baseline."}
+// ---- official-order tiebreaker engine (steps F/G SportSource + coin toss are not computable, so they resolve randomly and get counted) ----
+function buildCtx(res){const g={};B12T.forEach(t=>g[t]=[]);res.forEach(r=>{g[r[0]].push({opp:r[1],won:1});g[r[1]].push({opp:r[0],won:0})});return g}
+function wpVs(g,t,opps){const gs=g[t].filter(x=>opps.indexOf(x.opp)>=0);if(!gs.length)return null;return gs.reduce((s,x)=>s+x.won,0)/gs.length}
+function narrow(cand,vals){let best=-2,out=[],any=false;cand.forEach(t=>{const v=vals[t];if(v==null)return;any=true;if(v>best+1e-9){best=v;out=[t]}else if(Math.abs(v-best)<=1e-9)out.push(t)});return any?out:cand}
+function seedOne(pool,g,fin,flags){
+ let cand=pool.slice();
+ if(cand.length==2){
+  const a=cand[0],b=cand[1],pa=wpVs(g,a,[b]),pb=wpVs(g,b,[a]);
+  if(pa!=null&&pb!=null&&Math.abs(pa-pb)>1e-9)return pa>pb?a:b;
+ }else{
+  const playedAll=cand.every(t=>cand.every(o=>o==t||g[t].some(x=>x.opp==o)));
+  if(playedAll){const v={};cand.forEach(t=>v[t]=wpVs(g,t,cand.filter(o=>o!=t)));cand=narrow(cand,v);if(cand.length==1)return cand[0]}
+  else{const sweep=cand.find(t=>cand.every(o=>o==t||(g[t].some(x=>x.opp==o)&&g[t].filter(x=>x.opp==o).every(x=>x.won))));if(sweep)return sweep}
+ }
+ for(let step=0;step<4&&cand.length>1;step++){
+  if(step==0){const common=B12T.filter(o=>cand.indexOf(o)<0&&cand.every(t=>g[t].some(x=>x.opp==o)));if(!common.length)continue;const v={};cand.forEach(t=>v[t]=wpVs(g,t,common));cand=narrow(cand,v)}
+  else if(step==1){
+   const pct=t=>fin[t][0]/(fin[t][0]+fin[t][1]);
+   const order=B12T.slice().sort((x,y)=>pct(y)-pct(x));const groups=[];order.forEach(t=>{const gp=groups.find(gr=>Math.abs(pct(gr[0])-pct(t))<1e-9);if(gp)gp.push(t);else groups.push([t])});
+   for(const grp of groups){
+    const opps=grp.filter(t=>cand.indexOf(t)<0);if(!opps.length)continue;
+    if(!cand.every(t=>g[t].some(x=>opps.indexOf(x.opp)>=0)))continue;
+    const v={};cand.forEach(t=>v[t]=wpVs(g,t,opps));const n2=narrow(cand,v);
+    if(n2.length<cand.length){cand=n2;break}}
+  }
+  else if(step==2){const v={};cand.forEach(t=>{let w=0,n=0;g[t].forEach(x=>{w+=fin[x.opp][0];n+=fin[x.opp][0]+fin[x.opp][1]});v[t]=n?w/n:null});cand=narrow(cand,v)}
+  else{const v={};cand.forEach(t=>v[t]=fin[t][2]);cand=narrow(cand,v)}
+ }
+ if(cand.length==1)return cand[0];
+ flags.random++;return cand[Math.random()*cand.length|0]}
+function tieOrder(pool,g,fin,flags){const out=[],p=pool.slice();while(p.length>1){const w=seedOne(p,g,fin,flags);out.push(w);p.splice(p.indexOf(w),1)}if(p.length)out.push(p[0]);return out}
+function topSeeds(fin,g,flags){
+ const pct=t=>fin[t][0]/(fin[t][0]+fin[t][1]);
+ const order=B12T.slice().sort((x,y)=>pct(y)-pct(x));const groups=[];order.forEach(t=>{const gp=groups.find(gr=>Math.abs(pct(gr[0])-pct(t))<1e-9);if(gp)gp.push(t);else groups.push([t])});
+ const seeds=[];
+ for(const grp of groups){
+  if(seeds.length+grp.length<=2)seeds.push(...tieOrder(grp,g,fin,flags));
+  else{seeds.push(...tieOrder(grp,g,fin,flags).slice(0,2-seeds.length));break}}
+ return seeds.slice(0,2)}
+
+function curCtx(){const res=SD.done.map(g=>g[3]>g[2]?[g[1],g[0]]:[g[0],g[1]]);const fin={};B12T.forEach(t=>fin[t]=SD.rec[t].slice());return{g:buildCtx(res),fin}}
+function recStr(g,t,opps){const gs=g[t].filter(x=>opps.indexOf(x.opp)>=0);return gs.reduce((s,x)=>s+x.won,0)+"-"+(gs.length-gs.reduce((s,x)=>s+x.won,0))}
+function seedOneX(pool,g,fin){
+ let cand=pool.slice();
+ if(cand.length==2){
+  const a=cand[0],b=cand[1],pa=wpVs(g,a,[b]),pb=wpVs(g,b,[a]);
+  if(pa!=null&&pb!=null&&Math.abs(pa-pb)>1e-9){
+   const w=pa>pb?a:b;
+   const dg=(window.__done||SD.done).find(x=>(x[0]==a&&x[1]==b)||(x[0]==b&&x[1]==a));
+   return{winner:w,mkReason:n=>{let s=`Head-to-head: ${w} beat ${n}`;if(dg&&dg[2]!=null){const ws=dg[0]==w?dg[2]:dg[3],ls=dg[0]==w?dg[3]:dg[2];s+=` ${ws}-${ls}`}return s}}}
+ }else{
+  const playedAll=cand.every(t=>cand.every(o=>o==t||g[t].some(x=>x.opp==o)));
+  if(playedAll){
+   const v={};cand.forEach(t=>v[t]=wpVs(g,t,cand.filter(o=>o!=t)));cand=narrow(cand,v);
+   if(cand.length==1){const w=cand[0],rest=pool.filter(t=>t!=w);return{winner:w,mkReason:n=>`Record vs the tied teams: ${w} ${recStr(g,w,rest)}, ${n} ${recStr(g,n,pool.filter(t=>t!=n))}`}}
+  }else{
+   const sweep=cand.find(t=>cand.every(o=>o==t||(g[t].some(x=>x.opp==o)&&g[t].filter(x=>x.opp==o).every(x=>x.won))));
+   if(sweep)return{winner:sweep,mkReason:n=>`${sweep} beat every other team in the tie`}
+  }
+ }
+ for(let step=0;step<4&&cand.length>1;step++){
+  if(step==0){
+   const common=B12T.filter(o=>cand.indexOf(o)<0&&cand.every(t=>g[t].some(x=>x.opp==o)));if(!common.length)continue;
+   const v={};cand.forEach(t=>v[t]=wpVs(g,t,common));const n2=narrow(cand,v);
+   if(n2.length==1){const w=n2[0];return{winner:w,mkReason:n=>`Record vs common conference opponents (${common.join(", ")}): ${w} ${recStr(g,w,common)}, ${n} ${recStr(g,n,common)}`}}
+   cand=n2;
+  }else if(step==1){
+   const pct=t=>fin[t][0]/(fin[t][0]+fin[t][1]);
+   const order=B12T.slice().sort((x,y)=>pct(y)-pct(x));const groups=[];order.forEach(t=>{const gp=groups.find(gr=>Math.abs(pct(gr[0])-pct(t))<1e-9);if(gp)gp.push(t);else groups.push([t])});
+   let resolved=null;
+   for(const grp of groups){
+    const opps=grp.filter(t=>cand.indexOf(t)<0);if(!opps.length)continue;
+    if(!cand.every(t=>g[t].some(x=>opps.indexOf(x.opp)>=0)))continue;
+    const v={};cand.forEach(t=>v[t]=wpVs(g,t,opps));const n2=narrow(cand,v);
+    if(n2.length<cand.length){if(n2.length==1){const w=n2[0],lbl=opps.join(" + ");resolved={winner:w,mkReason:n=>`Record vs the highest-placed common opponent (${lbl}): ${w} ${recStr(g,w,opps)}, ${n} ${recStr(g,n,opps)}`}}cand=n2;break}
+   }
+   if(resolved)return resolved;
+  }else if(step==2){
+   const v={};cand.forEach(t=>{let w2=0,n=0;g[t].forEach(x=>{w2+=fin[x.opp][0];n+=fin[x.opp][0]+fin[x.opp][1]});v[t]=n?w2/n:null});
+   const n2=narrow(cand,v);
+   if(n2.length==1){const w=n2[0];const f=t=>(v[t]*100).toFixed(0)+"%";return{winner:w,mkReason:n=>`Strength of conference schedule: ${w} ${f(w)} vs ${n} ${f(n)}`}}
+   cand=n2;
+  }else{
+   const v={};cand.forEach(t=>v[t]=fin[t][2]);const n2=narrow(cand,v);
+   if(n2.length==1){const w=n2[0];return{winner:w,mkReason:n=>`Total wins this season: ${w} ${fin[w][2]}, ${n} ${fin[n][2]}`}}
+   cand=n2;
+  }
+ }
+ if(cand.length==1)return{winner:cand[0],mkReason:null};
+ const w=cand[Math.random()*cand.length|0];
+ return{winner:w,mkReason:n=>`No on-field separation yet - under the official order this would fall to the SportSource Analytics rating, then a coin toss`}}
+function rankTied(group,g,fin){const out=[],p=group.slice();while(p.length>1){const r=seedOneX(p,g,fin);out.push(r);p.splice(p.indexOf(r.winner),1)}out.push({winner:p[0],mkReason:null});return out}
+function confGroups(rec){rec=rec||SD.rec;const pct=t=>rec[t][0]/(rec[t][0]+rec[t][1]);const groups=[];B12T.slice().sort((x,y)=>pct(y)-pct(x)||rec[x][1]-rec[y][1]).forEach(t=>{const gr=groups.find(gr=>rec[gr[0]][0]==rec[t][0]&&rec[gr[0]][1]==rec[t][1]);if(gr)gr.push(t);else groups.push([t])});return groups}
+function tieRankAll(){const{g,fin}=curCtx();const out=[];confGroups().forEach(gr=>{if(gr.length<2)out.push(gr[0]);else rankTied(gr,g,fin).forEach(o=>out.push(o.winner))});return out}
+function renderTieNow(){
+ const{g,fin}=curCtx();
+ $("tbNow").innerHTML=tbHTML(SD.rec,g,fin,"today's results","Tiebreaker breakdown right now")}
+function tbHTML(rec,g,fin,ctxLabel,title){
+ let html=`<div class="tbcard"><h3>${title}</h3><div class="sub2">Each group tied on conference record, ordered by the official Big 12 procedure applied to ${ctxLabel} (full rules on the Tiebreakers tab). Informational midseason - nothing is locked until the regular season ends Nov 28.</div>`;
+ confGroups(rec).forEach(gr=>{
+  if(gr.length<2)return;
+  const order=rankTied(gr,g,fin),lbl=`${rec[gr[0]][0]}-${rec[gr[0]][1]}`;
+  html+=`<h4 style="margin:12px 0 4px">Tied at ${lbl}</h4>`;
+  order.forEach((o,i)=>{
+   html+=`<div class="tgrow">${i+1}. <b>${o.winner}</b></div>`;
+   if(o.mkReason)html+=`<div class="tgreason">${o.winner} above ${order[i+1].winner}: ${o.mkReason(order[i+1].winner)}</div>`;
+  })});
+ html+=`</div>`;
+ return html}
+
+
+let SC={picks:{}};
+const MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function fmtD(d){if(!d)return"";const p=d.split("-");return MN[+p[1]-1]+" "+(+p[2])}
+function allGames(){return SD.done.map((g,i)=>({id:"d"+i,a:g[0],h:g[1],as:g[2],hs:g[3],date:g[4]||"",played:true})).concat(SD.rem.map((g,i)=>({id:"r"+i,a:g[0],h:g[1],date:g[2]||"",played:false})))}
+function renderWhatif(){
+ const games=allGames(),picks=SC.picks,win={};
+ games.forEach(gm=>{if(gm.played)win[gm.id]=picks[gm.id]||(gm.hs>gm.as?gm.h:gm.a);else if(picks[gm.id])win[gm.id]=picks[gm.id]});
+ const rec={};B12T.forEach(t=>rec[t]=[0,0,0,0]);const res=[];
+ games.forEach(gm=>{const w=win[gm.id];if(!w)return;const l=w==gm.h?gm.a:gm.h;rec[w][0]++;rec[l][1]++;res.push([w,l])});
+ B12T.forEach(t=>{rec[t][2]=SD.rec[t][2]-SD.rec[t][0]+rec[t][0];rec[t][3]=SD.rec[t][3]-SD.rec[t][1]+rec[t][1]});
+ const g=buildCtx(res),fin=rec;
+ let html="",last="";
+ games.forEach(gm=>{
+  if(gm.date!=last){html+=`<div class="gdate">${fmtD(gm.date)}${gm.played?"":" &middot; upcoming"}</div>`;last=gm.date}
+  const w=win[gm.id],sc=gm.played?` <span class="sc">${gm.as}-${gm.hs}</span>`:"";
+  html+=`<div class="gline"><span class="gw${w==gm.a?" sel":""}" data-g="${gm.id}" data-t="${gm.a}">${gm.a}</span> at <span class="gw${w==gm.h?" sel":""}" data-g="${gm.id}" data-t="${gm.h}">${gm.h}</span>${sc}</div>`});
+ $("wGames").innerHTML=html;
+ document.querySelectorAll("#wGames .gw").forEach(el=>{el.onclick=()=>{
+  const id=el.dataset.g,t=el.dataset.t,gm=games.find(x=>x.id==id);
+  if(gm.played){const actual=gm.hs>gm.as?gm.h:gm.a,cur=SC.picks[id]||actual;
+   if(t==cur){if(t!=actual)delete SC.picks[id]}else SC.picks[id]=t;
+  }else{if(SC.picks[id]==t)delete SC.picks[id];else SC.picks[id]=t}
+  renderWhatif()}});
+ const unpicked=games.filter(gm=>!gm.played&&!win[gm.id]).length;
+ const order=[];confGroups(rec).forEach(gr=>{if(gr.length<2)order.push(gr[0]);else rankTied(gr,g,fin).forEach(o=>order.push(o.winner))});
+ $("wStand").innerHTML=`<h2 class="s">Scenario standings${unpicked?` <small style="color:var(--mut);font-size:13px">(${unpicked} remaining game${unpicked==1?"":"s"} unpicked)</small>`:""}</h2><table><tr><th>#</th><th>Team</th><th>Conf</th><th>Overall</th></tr>${order.map((t,i)=>`<tr><td>${i+1}</td><td>${t}</td><td>${rec[t][0]}-${rec[t][1]}</td><td>${rec[t][2]}-${rec[t][3]}</td></tr>`).join("")}</table>`;
+ window.__done=games.filter(gm=>gm.played).map(gm=>{const actual=gm.hs>gm.as?gm.h:gm.a;return win[gm.id]==actual?[gm.a,gm.h,gm.as,gm.hs]:[gm.a,gm.h,null,null]});
+ $("wTb").innerHTML=tbHTML(rec,g,fin,"this scenario","Scenario tiebreakers");
+ window.__done=null}
+$("wReset").onclick=()=>{SC={picks:{}};renderWhatif()};
+$("wAuto").onclick=()=>{const m=$("wMetric").value;if(m=="elo"&&!window.__elo)window.__elo=computeElo(SD.allg);const E=window.__elo;SD.rem.forEach((gm,i)=>{const p=m=="flip"?.5:m=="fpi"?1/(1+Math.exp(-((SD.fpi[gm[1]]-SD.fpi[gm[0]])+2.5)/12)):1/(1+Math.pow(10,-((E[gm[1]]-E[gm[0]])+65)/400));SC.picks["r"+i]=p>=.5?gm[1]:gm[0]});renderWhatif()};
+$("wShare").onclick=()=>{const u=location.origin+location.pathname+"#sc="+btoa(unescape(encodeURIComponent(JSON.stringify(SC.picks))));const done=()=>{$("wShare").textContent="Link copied";setTimeout(()=>$("wShare").textContent="Copy scenario link",1500)};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(done,()=>prompt("Share link:",u));else prompt("Share link:",u)};
+function loadScenario(){try{const h=location.hash.slice(1);if(!h.startsWith("sc="))return false;SC={picks:JSON.parse(decodeURIComponent(escape(atob(h.slice(3)))))||{}};showTab("w");return true}catch(e){return false}}
+
+// ---- run scenario tab: deterministic full-season projection ----
+let RS=null;
+function runProb(m,h,a){
+ if(m=="flip")return .5;
+ if(m=="fpi")return 1/(1+Math.exp(-((SD.fpi[h]-SD.fpi[a])+2.5)/12));
+ if(!window.__elo)window.__elo=computeElo(SD.allg);
+ return 1/(1+Math.pow(10,-((window.__elo[h]-window.__elo[a])+65)/400))}
+function renderRun(){
+ if(!RS){$("rOut").innerHTML='<div class="sub2">Pick a metric and hit <b>Run full season</b>.</div>';$("rGames").innerHTML="";$("rStand").innerHTML="";$("rTb").innerHTML="";return}
+ const m=RS.metric,mname=m=="fpi"?"ESPN FPI":m=="elo"?"Elo (2026 results)":"50/50 coin flip";
+ const srctag=m=="fpi"?(SD.fpiLive?"live FPI, updated "+SD.fpiUpdated:"static FPI snapshot from Oct 20, 2026"):(SD.live?"live ESPN results":"static snapshot from Oct 20, 2026");
+ const games=SD.rem.map((g,i)=>({id:"r"+i,a:g[0],h:g[1],date:g[2]||""}));
+ const rec={};B12T.forEach(t=>rec[t]=SD.rec[t].slice());
+ const res=SD.done.map(g=>g[3]>g[2]?[g[1],g[0]]:[g[0],g[1]]);
+ games.forEach(gm=>{const w=RS.picks[gm.id];if(!w)return;const l=w==gm.h?gm.a:gm.h;rec[w][0]++;rec[w][2]++;rec[l][1]++;rec[l][3]++;res.push([w,l])});
+ const g=buildCtx(res),fin=rec;
+ const unpicked=games.filter(gm=>!RS.picks[gm.id]).length;
+ $("rOut").innerHTML=`<div class="sub2">Favorites picked by <b>${mname}</b> (${srctag}). ${unpicked?unpicked+" game"+(unpicked==1?" is":"s are")+" unpicked - tap a team below to pick or flip.":"All "+games.length+" remaining games picked - tap any game to flip it."}</div>`;
+ let html="",last="";
+ games.forEach(gm=>{
+  if(gm.date!=last){html+=`<div class="gdate">${fmtD(gm.date)}</div>`;last=gm.date}
+  const w=RS.picks[gm.id];
+  html+=`<div class="gline"><span class="gw${w==gm.a?" sel":""}" data-g="${gm.id}" data-t="${gm.a}">${gm.a}</span> at <span class="gw${w==gm.h?" sel":""}" data-g="${gm.id}" data-t="${gm.h}">${gm.h}</span></div>`});
+ $("rGames").innerHTML='<h2 class="s">Predicted remaining games</h2>'+html;
+ document.querySelectorAll("#rGames .gw").forEach(el=>{el.onclick=()=>{
+  const id=el.dataset.g,t=el.dataset.t;
+  if(RS.picks[id]==t)delete RS.picks[id];else RS.picks[id]=t;
+  renderRun()}});
+ const order=[];confGroups(rec).forEach(gr=>{if(gr.length<2)order.push(gr[0]);else rankTied(gr,g,fin).forEach(o=>order.push(o.winner))});
+ let champ="";
+ if(!unpicked&&order.length>1){
+  const p=runProb(m,order[0],order[1])||.5,fav=p>=.5?order[0]:order[1],pct=Math.round(100*Math.max(p,1-p));
+  champ=`<div class="sub2" style="margin-top:6px">Projected championship game, Dec 5: <b>${order[0]} vs ${order[1]}</b> - ${mname} favors ${fav} at about ${pct}% on a neutral field.</div>`}
+ $("rStand").innerHTML=`<h2 class="s">Final standings - full 12-game season</h2><table><tr><th>#</th><th>Team</th><th>Conf</th><th>Overall</th></tr>${order.map((t,i)=>`<tr><td>${i+1}</td><td>${t}</td><td>${rec[t][0]}-${rec[t][1]}</td><td>${rec[t][2]}-${rec[t][3]}</td></tr>`).join("")}</table>${champ}`;
+ $("rTb").innerHTML=tbHTML(rec,g,fin,"this full-season scenario","Scenario tiebreakers")}
+$("rRun").onclick=()=>{const m=$("rMetric").value;RS={metric:m,picks:{}};SD.rem.forEach((gm,i)=>{const p=runProb(m,gm[1],gm[0]);RS.picks["r"+i]=p>=.5?gm[1]:gm[0]});renderRun()};
+$("rReset").onclick=()=>{RS=null;renderRun()};
+
+let ELO=null;
+$("runsim").onclick=()=>{
+ const metric=$("metric").value;ELO=computeElo(SD.allg);
+ const N=2000,titles={},apps={},wins={},matchups={},flags={random:0},cw={};
+ B12T.forEach(t=>{titles[t]=0;apps[t]=0;cw[t]=0});
+ for(let i=0;i<N;i++){
+  const res=SD.done.map(g=>g[3]>g[2]?[g[1],g[0]]:[g[0],g[1]]);
+  const simres=SD.rem.map(g=>{const p=winProb(metric,g[1],g[0],false);return Math.random()<p?[g[1],g[0]]:[g[0],g[1]]});
+  res.push(...simres);
+  const fin={};B12T.forEach(t=>fin[t]=SD.rec[t].slice());
+  simres.forEach(r=>{fin[r[0]][0]++;fin[r[0]][2]++;fin[r[1]][1]++;fin[r[1]][3]++});
+  const g=buildCtx(res),seeds=topSeeds(fin,g,flags);
+  seeds.forEach(t=>apps[t]++);
+  const p=winProb(metric,seeds[0],seeds[1],true),champ=Math.random()<p?seeds[0]:seeds[1];
+  titles[champ]++;const mk=seeds.slice().sort().join(" vs ");matchups[mk]=(matchups[mk]||0)+1;
+  B12T.forEach(t=>cw[t]+=fin[t][0]);
+ }
+ const rows=B12T.slice().sort((x,y)=>apps[y]-apps[x]||titles[y]-titles[x]).map(t=>`<tr><td>${t}</td><td>${(cw[t]/N).toFixed(1)}-${(9-cw[t]/N).toFixed(1)}</td><td>${(100*apps[t]/N).toFixed(1)}%</td><td>${(100*titles[t]/N).toFixed(1)}%</td></tr>`).join("");
+ const top=Object.keys(matchups).sort((a,b)=>matchups[b]-matchups[a])[0];
+ const srcName=metric=="fpi"?"ESPN FPI":metric=="elo"?"Elo (2026 results)":"Coin flip";
+ $("simOut").innerHTML=`<h2 class="s">Projected final standings - ${srcName}, ${N.toLocaleString()} seasons</h2>
+ <div class="tbcard"><div class="sub2">Most likely championship matchup: <b>${top}</b> (${(100*matchups[top]/N).toFixed(1)}% of seasons). Ties for the top two seeds are broken with the official Big 12 order - head-to-head, common opponents, walk down the standings, strength of conference schedule, total wins (see Tiebreakers tab). The last two official steps (SportSource Analytics rating, then a coin toss) aren't computable, so a season that gets that far is settled randomly - that happened in ${(100*flags.random/N).toFixed(1)}% of seasons.</div>
+ <table><tr><th>Team</th><th>Proj conf W-L</th><th>Title game</th><th>Champion</th></tr>${rows}</table></div>`;
+ $("simOut").scrollIntoView({behavior:"smooth"})};
+
+$("metric").onchange=metricNote;loadSimData();
+loadScenario();
+</script></body></html>
