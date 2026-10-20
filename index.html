@@ -419,13 +419,15 @@ function renderTieNow(){
  $("tbNow").innerHTML=tbHTML(SD.rec,g,fin,"today's results","Tiebreaker breakdown right now")}
 function tbHTML(rec,g,fin,ctxLabel,title){
  let html=`<div class="tbcard"><h3>${title}</h3><div class="sub2">Each group tied on conference record, ordered by the official Big 12 procedure applied to ${ctxLabel} (full rules on the Tiebreakers tab). Informational midseason - nothing is locked until the regular season ends Nov 28.</div>`;
+ let seed=1;
  confGroups(rec).forEach(gr=>{
+  const start=seed;seed+=gr.length;
   if(gr.length<2)return;
   const order=rankTied(gr,g,fin),lbl=`${rec[gr[0]][0]}-${rec[gr[0]][1]}`;
   html+=`<h4 style="margin:12px 0 4px">Tied at ${lbl}</h4>`;
   order.forEach((o,i)=>{
-   html+=`<div class="tgrow">${i+1}. <b>${o.winner}</b></div>`;
-   if(o.mkReason)html+=`<div class="tgreason">${o.winner} above ${order[i+1].winner}: ${o.mkReason(order[i+1].winner)}</div>`;
+   html+=`<div class="tgrow">${start+i}. <b>${o.winner}</b></div>`;
+   if(o.mkReason)html+=`<div class="tgreason">#${start+i} ${o.winner} above #${start+i+1} ${order[i+1].winner}: ${o.mkReason(order[i+1].winner)}</div>`;
   })});
  html+=`</div>`;
  return html}
