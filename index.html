@@ -8,6 +8,7 @@ header{padding:22px 16px 6px;text-align:center}h1{margin:0;font-size:26px}header
 main{max-width:1000px;margin:auto;padding:12px 14px 50px}
 .bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:14px 0}
 button,select{background:var(--card);color:var(--ink);border:1px solid #2c3858;border-radius:9px;padding:10px 14px;font:inherit;cursor:pointer}
+.ptxt{flex:1;min-width:180px;background:var(--card);color:var(--ink);border:1px solid #2c3858;border-radius:9px;padding:10px 14px;font:inherit}
 button.p{background:var(--a);color:#111;border:0;font-weight:700}button:hover{filter:brightness(1.15)}
 .quads{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
 .q{background:var(--card);border-radius:12px;padding:12px;border-top:4px solid #555}
@@ -107,6 +108,12 @@ table{width:100%;border-collapse:collapse}td,th{padding:4px 6px;text-align:left}
 <button id="wReset">Reset to real results</button>
 <button id="wShare">Copy scenario link</button>
 </div>
+<div class="sub2" style="margin-top:10px"><b>Or describe a scenario:</b> type it in plain English and the game picks below get set for you. Tap any game to fine-tune after.</div>
+<div class="bar" style="justify-content:flex-start;margin:2px 0 8px">
+<input class="ptxt" id="wPrompt" type="text" placeholder="e.g. BYU wins out, Utah loses to Kansas, Tech beats Arizona" autocomplete="off">
+<button class="p" id="wParse">Apply scenario</button>
+</div>
+<div id="wPromptOut"></div>
 <div id="wGames"></div>
 <div id="wStand"></div>
 <div id="wTb"></div>
@@ -120,6 +127,12 @@ table{width:100%;border-collapse:collapse}td,th{padding:4px 6px;text-align:left}
 <button id="rRun">Run full season</button>
 <button id="rReset">Reset picks</button>
 </div>
+<div class="sub2" style="margin-top:10px"><b>Or describe a scenario:</b> type it in plain English and it runs the full season with your picks applied.</div>
+<div class="bar" style="justify-content:flex-start;margin:2px 0 8px">
+<input class="ptxt" id="rPrompt" type="text" placeholder="e.g. BYU wins out, Utah loses to Kansas, Tech beats Arizona" autocomplete="off">
+<button class="p" id="rParse">Apply scenario</button>
+</div>
+<div id="rPromptOut"></div>
 <div id="rOut"></div>
 <div id="rGames"></div>
 <div id="rStand"></div>
@@ -466,6 +479,60 @@ $("wReset").onclick=()=>{SC={picks:{}};renderWhatif()};
 $("wAuto").onclick=()=>{const m=$("wMetric").value;if(m=="elo"&&!window.__elo)window.__elo=computeElo(SD.allg);const E=window.__elo;SD.rem.forEach((gm,i)=>{const p=m=="flip"?.5:m=="fpi"?1/(1+Math.exp(-((SD.fpi[gm[1]]-SD.fpi[gm[0]])+2.5)/12)):1/(1+Math.pow(10,-((E[gm[1]]-E[gm[0]])+65)/400));SC.picks["r"+i]=p>=.5?gm[1]:gm[0]});renderWhatif()};
 $("wShare").onclick=()=>{const u=location.origin+location.pathname+"#sc="+btoa(unescape(encodeURIComponent(JSON.stringify(SC.picks))));const done=()=>{$("wShare").textContent="Link copied";setTimeout(()=>$("wShare").textContent="Copy scenario link",1500)};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(done,()=>prompt("Share link:",u));else prompt("Share link:",u)};
 function loadScenario(){try{const h=location.hash.slice(1);if(!h.startsWith("sc="))return false;SC={picks:JSON.parse(decodeURIComponent(escape(atob(h.slice(3)))))||{}};showTab("w");return true}catch(e){return false}}
+
+// ---- scenario prompt: type a plain-English scenario, it sets the picks ----
+const TALIAS={};
+[["Arizona",["arizona","zona","uofa"]],["Arizona State",["arizona state","az state","asu","sun devils"]],["Baylor",["baylor","bears","bu"]],["BYU",["byu"]],["Cincinnati",["cincinnati","cincy","bearcats","uc"]],["Colorado",["colorado","buffs","buffaloes","cu"]],["Houston",["houston","uh"]],["Iowa State",["iowa state","cyclones","isu"]],["Kansas",["kansas","jayhawks","ku"]],["Kansas State",["kansas state","k-state","kstate","ksu","wildcats"]],["Oklahoma State",["oklahoma state","ok state","okstate","okie state","osu","pokes","cowboys"]],["TCU",["tcu","horned frogs","frogs"]],["Texas Tech",["texas tech","red raiders","tech","ttu"]],["UCF",["ucf","knights"]],["Utah",["utah","utes"]],["West Virginia",["west virginia","wvu","mountaineers"]]].forEach(p=>p[1].forEach(a=>TALIAS[a]=p[0]));
+const ALTS=Object.keys(TALIAS).sort((a,b)=>b.length-a.length).join("|");
+const canonT=a=>TALIAS[a.toLowerCase()];
+function remIdx(x,y){return SD.rem.findIndex(g=>(g[0]==x&&g[1]==y)||(g[0]==y&&g[1]==x))}
+function parseScenario(text){
+ const s=" "+text.toLowerCase().replace(/[’']/g,"").replace(/[^a-z0-9\s-]/g," ").replace(/\s+/g," ").trim()+" ";
+ const T="\\b("+ALTS+")\\b";
+ const mask=new Array(s.length).fill(0);
+ const set=[],notes=[];
+ const rules=[
+  {re:new RegExp(T+"\\s+(?:and\\s+"+T+"\\s+)?(?:both\\s+)?(?:wins? out|wins? the rest|runs? the table|goes? undefeated|sweeps? the rest)(?:\\s+(?:except|but)(?:\\s+loses?)?(?:\\s+(?:to|at|vs|against))?\\s+"+T+")?","g"),
+   f:(a,b,x)=>{const ts=[canonT(a)];if(b&&canonT(b)!=ts[0])ts.push(canonT(b));
+    ts.forEach(t=>{let n=0;SD.rem.forEach((g,i)=>{if(g[0]==t||g[1]==t){set.push({i,w:t});n++}});if(!n)notes.push(t+" has no remaining Big 12 games.")});
+    if(x){const t=ts[0],o=canonT(x),i=remIdx(t,o);if(i>=0)set.push({i,w:o});else notes.push("There is no remaining "+t+" vs "+o+" game to exclude.")}}},
+  {re:new RegExp(T+"\\s+(?:loses? out|goes? winless|loses? the rest|loses? them all|loses? every (?:remaining )?game)","g"),
+   f:a=>{const t=canonT(a);let n=0;SD.rem.forEach((g,i)=>{if(g[0]==t||g[1]==t){set.push({i,w:g[0]==t?g[1]:g[0]});n++}});if(!n)notes.push(t+" has no remaining Big 12 games.")}},
+  {re:new RegExp(T+"\\s+(?:beats?|defeats?|upsets?|tops?|stuns|knocks off|takes down|blows out|edges|handles|rolls(?: past)?|wins? (?:vs|at|over|against))\\s+"+T,"g"),
+   f:(a,b)=>{const w=canonT(a),l=canonT(b),i=remIdx(w,l);if(i>=0)set.push({i,w});else notes.push("There is no remaining "+w+" vs "+l+" game on the schedule.")}},
+  {re:new RegExp(T+"\\s+(?:loses?|falls|drops(?: a| the| one)?(?: game)?|gets beat|gets upset|gets blown out)(?:\\s+(?:to|at|vs|against|by))\\s+"+T,"g"),
+   f:(a,b)=>{const l=canonT(a),w=canonT(b),i=remIdx(w,l);if(i>=0)set.push({i,w});else notes.push("There is no remaining "+w+" vs "+l+" game on the schedule.")}}
+ ];
+ rules.forEach(r=>{let m;r.re.lastIndex=0;while((m=r.re.exec(s))){const st=m.index,en=st+m[0].length;let busy=false;for(let i=st;i<en;i++)if(mask[i]){busy=true;break}if(busy)continue;for(let i=st;i<en;i++)mask[i]=1;r.f.apply(null,m.slice(1))}});
+ let fail=[],cur="";
+ for(let i=0;i<=s.length;i++){if(i==s.length||mask[i]){const f=cur.trim();if(f&&!/^(and|then|also|plus|if|so|the)$/.test(f))fail.push(f);cur=""}else cur+=s[i]}
+ return{set,notes,fail}}
+function promptSummary(r,map){
+ const idxs=Object.keys(map);let html="";
+ if(idxs.length){
+  const byW={};idxs.forEach(i=>{const g=SD.rem[i],w=map[i],l=w==g[0]?g[1]:g[0];(byW[w]=byW[w]||[]).push(l)});
+  html+='<div class="sub2" style="color:var(--ink)">Scenario applied - '+idxs.length+' pick'+(idxs.length==1?"":"s")+' set: '+Object.keys(byW).map(w=>"<b>"+w+"</b> over "+byW[w].join(", ")).join("; ")+". Tap any game below to adjust.</div>"}
+ r.notes.forEach(n=>html+='<div class="sub2" style="color:var(--a)">'+n+"</div>");
+ if(r.fail.length)html+='<div class="sub2" style="color:var(--a)">Couldn&#8217;t understand: &#8220;'+r.fail.join("&#8221;, &#8220;")+'&#8221; - try phrasing like &#8220;BYU wins out&#8221;, &#8220;Utah loses to Kansas&#8221; or &#8220;Texas Tech beats Arizona&#8221;.</div>';
+ if(!idxs.length&&!r.fail.length)html='<div class="sub2" style="color:var(--a)">No picks were set - try phrasing like &#8220;BYU wins out&#8221; or &#8220;Utah loses to Kansas&#8221;.</div>';
+ return html}
+function applyWhatScenario(){
+ const txt=$("wPrompt").value.trim(),out=$("wPromptOut");
+ if(!txt){out.innerHTML="";return}
+ const r=parseScenario(txt),map={};r.set.forEach(e=>map[e.i]=e.w);
+ Object.keys(map).forEach(i=>SC.picks["r"+i]=map[i]);
+ out.innerHTML=promptSummary(r,map);renderWhatif()}
+$("wParse").onclick=applyWhatScenario;
+$("wPrompt").addEventListener("keydown",e=>{if(e.key=="Enter")applyWhatScenario()});
+function applyRunScenario(){
+ const txt=$("rPrompt").value.trim(),out=$("rPromptOut");
+ if(!txt){out.innerHTML="";return}
+ if(!RS){RS={metric:$("rMetric").value,picks:{}};SD.rem.forEach((gm,i)=>{const p=runProb(RS.metric,gm[1],gm[0]);RS.picks["r"+i]=p>=.5?gm[1]:gm[0]})}
+ const r=parseScenario(txt),map={};r.set.forEach(e=>map[e.i]=e.w);
+ Object.keys(map).forEach(i=>RS.picks["r"+i]=map[i]);
+ out.innerHTML=promptSummary(r,map);renderRun()}
+$("rParse").onclick=applyRunScenario;
+$("rPrompt").addEventListener("keydown",e=>{if(e.key=="Enter")applyRunScenario()});
 
 // ---- run scenario tab: deterministic full-season projection ----
 let RS=null;
