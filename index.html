@@ -64,7 +64,7 @@ table{width:100%;border-collapse:collapse}td,th{padding:4px 6px;text-align:left}
 .tgreason{color:var(--mut);font-size:13px;padding:0 0 6px 18px}
 .xl{background:var(--card);color:var(--ink);border:1px solid #2c3858;border-radius:9px;padding:10px 14px;font:inherit;text-decoration:none;display:inline-block}.xl:hover{filter:brightness(1.15)}
 
-#burger{display:none;font-size:20px;padding:8px 14px}
+#burger{display:none;font-size:20px;padding:8px 14px;position:relative;z-index:60}
 @media(max-width:760px){
  #burger{display:block;margin:0 auto}
  .bar.tabs{display:none;flex-direction:column;position:absolute;left:12px;right:12px;top:48px;background:var(--card);border:1px solid #2c3858;border-radius:12px;padding:10px;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.5)}
@@ -74,7 +74,7 @@ table{width:100%;border-collapse:collapse}td,th{padding:4px 6px;text-align:left}
 </style></head><body>
 <header><h1>Big 12 Standings &amp; Scenarios</h1><p>Live standings, a rest-of-season simulator, what-if and run-scenario tools, and the official tiebreakers. Mock schedule builder lives on the sister site.</p></header>
 <main>
-<button id="burger" aria-label="Open menu">&#9776; Menu</button>
+<button id="burger" aria-label="Menu" aria-expanded="false" aria-controls="tabs">&#9776; Menu</button>
 <div class="bar tabs" id="tabs">
 <a class="xl" href="https://pouchman27.github.io/big12-scheduler/">&#8592; Mock Scheduler</a>
 <button class="p" id="tabReal">Real Big 12</button>
@@ -273,9 +273,9 @@ function standings(){
 // pair select lives on scheduler site
 
 
-function showTab(v){$("realView").style.display=v=="r"?"":"none";$("simView").style.display=v=="i"?"":"none";$("whatView").style.display=v=="w"?"":"none";$("runView").style.display=v=="n"?"":"none";$("tbView").style.display=v=="t"?"":"none";$("tabReal").classList.toggle("p",v=="r");$("tabSim").classList.toggle("p",v=="i");$("tabWhat").classList.toggle("p",v=="w");$("tabRun").classList.toggle("p",v=="n");$("tabTB").classList.toggle("p",v=="t");if(v=="w")renderWhatif();if(v=="n")renderRun();const _tb=$("tabs");_tb&&_tb.classList.remove("open")}
+function showTab(v){$("realView").style.display=v=="r"?"":"none";$("simView").style.display=v=="i"?"":"none";$("whatView").style.display=v=="w"?"":"none";$("runView").style.display=v=="n"?"":"none";$("tbView").style.display=v=="t"?"":"none";$("tabReal").classList.toggle("p",v=="r");$("tabSim").classList.toggle("p",v=="i");$("tabWhat").classList.toggle("p",v=="w");$("tabRun").classList.toggle("p",v=="n");$("tabTB").classList.toggle("p",v=="t");if(v=="w")renderWhatif();if(v=="n")renderRun();const _tb=$("tabs");if(_tb){_tb.classList.remove("open");const _b=$("burger");if(_b){_b.setAttribute("aria-expanded","false");_b.innerHTML="&#9776; Menu"}}}
 // tabSched lives on the scheduler site
-$("tabReal").onclick=()=>showTab("r");$("tabSim").onclick=()=>showTab("i");$("tabWhat").onclick=()=>showTab("w");$("tabRun").onclick=()=>showTab("n");$("tabTB").onclick=()=>showTab("t");$("burger").onclick=()=>$("tabs").classList.toggle("open");
+$("tabReal").onclick=()=>showTab("r");$("tabSim").onclick=()=>showTab("i");$("tabWhat").onclick=()=>showTab("w");$("tabRun").onclick=()=>showTab("n");$("tabTB").onclick=()=>showTab("t");$("burger").onclick=()=>{const t=$("tabs"),open=t.classList.toggle("open");const b=$("burger");b.setAttribute("aria-expanded",open?"true":"false");b.innerHTML=open?"&#10005; Close":"&#9776; Menu"};
 // moved to scheduler site
 function loadHash(){try{const h=location.hash.slice(1);if(!h)return;const d=JSON.parse(decodeURIComponent(escape(atob(h))));if(!d||!Array.isArray(d.Q)||d.Q.length!=4)return;const flat=d.Q.flatMap(q=>q.teams);if(d.Q.some(q=>q.teams.length!=4)||flat.length!=16||ALL.some(t=>!flat.includes(t)))return;Q=d.Q.map(q=>({name:String(q.name).slice(0,30),teams:q.teams.slice()}));pairIdx=[0,1,2].includes(d.pairIdx)?d.pairIdx:0;save()}catch(e){}}
 // moved to scheduler site
