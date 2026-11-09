@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>Projected bid thieves | Big 12 Standings &amp; Scenarios</title>
-<meta content="Which conference champions could take a CFP spot while ranked behind BYU - projected from ESPN FPI title odds and the CFP rankings." name="description"/>
+<meta content="Which conference champions could take a CFP spot while ranked behind BYU - projected from ESPN FPI title odds and the AP poll (provisional until the CFP rankings)." name="description"/>
 <style>
 :root{--bg:#0f1420;--card:#192033;--ink:#eef2fb;--mut:#a7b3cc;--a:#f5b700;--b:#4cc3ff;--rule:#2c3858;--good:#3ddc84;--bad:#ff6b6b}
 *{box-sizing:border-box}body{margin:0;font:15px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--ink)}
@@ -30,7 +30,7 @@ button.reset:hover{border-color:var(--b)}
 <nav aria-label="Site navigation" class="nav"><a href="./">&larr; Big 12 tools</a><a href="opponents.html">Opponent win %</a><a href="cfp.html">CFP schedules &amp; odds</a><a href="tv.html">BYU rooting guide</a></nav>
 <h1>Projected bid thieves</h1>
 <p class="intro">A <b>bid thief</b> (your definition): a team that wins its conference championship game while ranked <b>behind BYU</b>, but still takes a playoff spot. Under the 2026 CFP format the ACC, Big Ten, Big 12 and SEC champions are automatic, the highest-ranked champion from the six other leagues is automatic, Notre Dame is in if it finishes in the CFP top 12, and the next seven highest-ranked teams fill the rest. Every champion ranked behind BYU eats one of those spots.</p>
-<p class="fine">Format: <a href="https://collegefootballplayoff.com/news/2026/8/6/sc-aug-2627" target="_blank" rel="noopener">CFP Selection Committee, 2026-27 format</a> and <a href="https://collegefootballplayoff.com/news/2026/11/2/cfp-sc-101" target="_blank" rel="noopener">how the field is built</a>. Title odds are <a href="https://www.espn.com/college-football/fpi" target="_blank" rel="noopener">ESPN FPI</a> season simulations, not a committee prediction. Rankings are the <b>CFP rankings from Nov 3</b> (games through Oct 31) - new rankings land Tuesday night, Nov 10, and BYU has since lost at Utah, so expect movement. This is a projection, not a promise.</p>
+<p class="fine">Format: <a href="https://collegefootballplayoff.com/news/2026/8/6/sc-aug-2627" target="_blank" rel="noopener">CFP Selection Committee, 2026-27 format</a> and <a href="https://collegefootballplayoff.com/news/2026/11/2/cfp-sc-101" target="_blank" rel="noopener">how the field is built</a>. Title odds are <a href="https://www.espn.com/college-football/fpi" target="_blank" rel="noopener">ESPN FPI</a> season simulations, not a committee prediction. Rankings are the <b>AP poll from Nov 8</b> (includes BYU's loss at Utah) as a provisional stand-in - the CFP committee's own rankings decide the real field, and the next set lands Tuesday night, Nov 10. This is a projection, not a promise.</p>
 
 <div class="card" id="byu"></div>
 
@@ -39,7 +39,7 @@ button.reset:hover{border-color:var(--b)}
 <div class="confs" id="confs"></div>
 
 <h2>Projected 12-team field</h2>
-<div class="card"><div class="lead">Built from your champion picks + the CFP rankings</div><div style="overflow-x:auto"><table id="field"></table></div><div class="status" id="byustat"></div></div>
+<div class="card"><div class="lead">Built from your champion picks + the AP poll (provisional ranking basis)</div><div style="overflow-x:auto"><table id="field"></table></div><div class="status" id="byustat"></div></div>
 
 <p class="fine" id="src"></p>
 </main>
@@ -57,18 +57,23 @@ function live(){return SNAP.liveOdds?"LIVE odds from ESPN FPI - refreshed on eve
 function contenders(ck){return SNAP.teams.filter(r=>r[1]&&r[2]===ck&&r[8]>0).map(r=>T[r[0]]).sort((a,b)=>b.wc-a.wc)}
 function fav(ck){const c=contenders(ck);return c.length?c[0]:null}
 function champ(ck){const c=contenders(ck);if(!c.length)return null;const p=picks[ck];const f=c.find(t=>t.id===p);return f||c[0]}
-function rankOf(t){return t.cfp?("CFP #"+t.cfp):t.ap?("AP #"+t.ap):"unranked"}
-function behind(t){const b=T[BYU];const tr=t.cfp!=null?t.cfp:999;return tr>(b.cfp!=null?b.cfp:999)}
+// Ranking basis: "ap" is the provisional stand-in (user-approved) until the CFP rankings land Tuesday Nov 10.
+// To switch: set BASIS="cfp", refresh SNAP's cfp column + cfpDate from the new release, and update the date strings.
+const BASIS="ap";
+const BASISLBL=BASIS==="ap"?"AP":"CFP";
+function rk(t){const v=BASIS==="ap"?t.ap:t.cfp;return v!=null?v:1000}
+function rankOf(t){const v=BASIS==="ap"?t.ap:t.cfp;return v!=null?(BASISLBL+" #"+v):"unranked"}
+function behind(t){return rk(t)>rk(T[BYU])}
 function g5Slot(){
  const cands=G5.map(champ).filter(Boolean);
- cands.sort((x,y)=>(x.cfp!=null?x.cfp:1000)-(y.cfp!=null?y.cfp:1000)||(x.ap!=null?x.ap:1000)-(y.ap!=null?y.ap:1000)||x.fr-y.fr);
+ cands.sort((x,y)=>rk(x)-rk(y)||x.fr-y.fr);
  return cands[0];
 }
 function render(){
  const b=T[BYU];
  $("byu").innerHTML=`<div class="lead">BYU checkpoint</div>
- <div style="font-size:18px;font-weight:700;margin-top:4px">BYU - CFP #${b.cfp} <span style="color:var(--mut);font-weight:400;font-size:13px">(${SNAP.cfpDate}, through Oct 31)</span> &middot; AP #${b.ap} &middot; ${b.ow}-${b.ol} overall, ${b.cw}-${b.cl} in the Big 12</div>
- <div class="fine" style="margin-top:4px">FPI gives BYU a ${b.wc}% shot at the Big 12 title (automatic bid) and ${b.po}% to make the playoff. BYU lost at Utah on Nov 7 after these rankings - the Nov 10 refresh will move things.</div>`;
+ <div style="font-size:18px;font-weight:700;margin-top:4px">BYU - AP #${b.ap} <span style="color:var(--mut);font-weight:400;font-size:13px">(Nov 8, after the Utah loss)</span> &middot; CFP #${b.cfp} <span style="color:var(--mut);font-weight:400;font-size:13px">(Nov 3, before it)</span> &middot; ${b.ow}-${b.ol} overall, ${b.cw}-${b.cl} in the Big 12</div>
+ <div class="fine" style="margin-top:4px">FPI gives BYU a ${b.wc}% shot at the Big 12 title (automatic bid) and ${b.po}% to make the playoff. The AP poll is the provisional ranking basis here; the CFP committee's rankings decide the real field and the next set lands Tuesday night, Nov 10.</div>`;
  let ch="";
  [...P4,...G5].forEach(ck=>{
   const c=contenders(ck);if(!c.length)return;
@@ -76,7 +81,7 @@ function render(){
   ch+=`<div class="card" style="margin:0"><h3>${CN[ck]}</h3>`;
   c.slice(0,5).forEach(t=>{
    const on=ch2&&ch2.id===t.id;
-   const th=behind(t)?`<span class="tag thief">THIEF</span>`:`<span class="tag aq">ahead of BYU</span>`;
+   const th=t.id===BYU?"":behind(t)?`<span class="tag thief">THIEF</span>`:`<span class="tag aq">ahead of BYU</span>`;
    const byu=t.id===BYU?` <span class="tag byu">BYU</span>`:"";
    ch+=`<div class="tm ${on?"on":""}" data-c="${ck}" data-t="${t.id}"><span class="nm">${t.n}</span>${byu}<span class="rec">${t.cw}-${t.cl} conf &middot; ${rankOf(t)}</span>${th}<span class="odds">${t.wc}%</span></div>`;
   });
@@ -92,24 +97,21 @@ function render(){
  const champs=P4.map(champ).filter(Boolean);
  const g5=g5Slot();if(g5)champs.push(g5);
  const nd=T["87"];
- const ndIn=nd&&nd.cfp!=null&&nd.cfp<=12;
+ const ndIn=nd&&rk(nd)<=12;
  const inIds={};champs.forEach(t=>inIds[t.id]=1);if(ndIn)inIds["87"]=1;
- const atlarge=SNAP.teams.map(r=>T[r[0]]).filter(t=>t.cfp!=null&&!inIds[t.id]).sort((x,y)=>x.cfp-y.cfp);
+ const atlarge=SNAP.teams.map(r=>T[r[0]]).filter(t=>rk(t)<1000&&!inIds[t.id]).sort((x,y)=>rk(x)-rk(y));
  const field=champs.slice();if(ndIn)field.push(nd);
  let need=12-field.length;
  for(const t of atlarge){if(need<=0)break;field.push(t);need--}
- // seeding: by CFP rank; automatic qualifiers outside the top 12 slot at the bottom
+ // seeding: by ranking; automatic qualifiers outside the top 12 slot at the bottom
  const isAQ=t=>champs.indexOf(t)>=0;
- field.sort((x,y)=>{
-  const xr=x.cfp!=null?x.cfp:1000,yr=y.cfp!=null?y.cfp:1000;
-  return xr-yr||(x.ap!=null?x.ap:1000)-(y.ap!=null?y.ap:1000)||x.fr-y.fr;
- });
+ field.sort((x,y)=>rk(x)-rk(y)||x.fr-y.fr);
  let fh=`<tr><th>Seed</th><th>Team</th><th>How they're in</th><th>Ranking</th><th></th></tr>`;
  field.forEach((t,i)=>{
   const how=isAQ(t)?(CN[t.c]+" champion (auto)"):t.id==="87"?"Notre Dame (top-12 rule)":"At-large";
   const th=isAQ(t)&&behind(t)?`<span class="tag thief">THIEF</span>`:"";
   const byu=t.id===BYU?` <span class="tag byu">BYU</span>`:"";
-  const note=t.cfp==null?"outside CFP top 25 - seeded at the back as an auto-bid":"";
+  const note=rk(t)>=1000?("outside "+BASISLBL+" top 25 - seeded at the back as an auto-bid"):"";
   fh+=`<tr${t.id===BYU?' class="hl"':""}><td>${i+1}</td><td><b>${t.n}</b>${byu}</td><td>${how}</td><td>${rankOf(t)}${note?` <span class="fine">${note}</span>`:""}</td><td>${th}</td></tr>`;
  });
  $("field").innerHTML=fh;
@@ -122,7 +124,7 @@ function render(){
  else stat=`<b class="losing">BYU is OUT in this projection.</b>`;
  stat+=` Bid thieves in the field (champions ranked behind BYU): <b>${thieves.length}</b>${thieves.length?" - "+thieves.map(t=>`${t.n} (${CN[t.c]})`).join(", "):""}.`;
  $("byustat").innerHTML=stat;
- $("src").textContent=live()+" Champion picks save on this device. Rankings: CFP top 25 from "+SNAP.cfpDate+" (next: Nov 10), AP from Nov 8.";
+ $("src").textContent=live()+" Champion picks save on this device. Rankings: AP top 25 from Nov 8 (provisional basis) - the CFP committee's rankings return Tuesday Nov 10 and take over as the basis.";
 }
 $("reset").onclick=()=>{picks={};save();render()};
 async function loadLive(){
