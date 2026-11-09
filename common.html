@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
-<title>Common opponents: compare any teams | Big 12 Standings &amp; Scenarios</title>
-<meta content="Pick BYU and any set of Big 12 teams to see shared and unshared conference opponents, with each team's results - the raw material for tiebreak step B." name="description"/>
+<title>Common opponents + full tiebreaker walkthrough | Big 12 Standings &amp; Scenarios</title>
+<meta content="Pick BYU and any set of Big 12 teams to see shared and unshared conference opponents, then walk every leg of the official tiebreaker, numbered in order, three-way ties included." name="description"/>
 <style>
 :root{--bg:#0f1420;--card:#192033;--ink:#eef2fb;--mut:#a7b3cc;--a:#f5b700;--b:#4cc3ff;--rule:#2c3858;--good:#3ddc84;--bad:#ff6b6b}
 *{box-sizing:border-box}body{margin:0;font:15px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--ink)}
@@ -27,12 +27,24 @@ td.mut{color:var(--mut)}
 .sumline{font-size:15px;margin:6px 0}
 .sumline b{color:var(--ink)}
 .pill{display:inline-block;background:#232d47;border-radius:7px;padding:3px 9px;margin:3px 4px 3px 0;font-size:13px}
+.steprow{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--rule)}
+.steprow.first{border-top:0}
+.steprow .num{flex:0 0 26px;height:26px;border-radius:50%;background:#232d47;color:var(--a);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px}
+.steprow.dec .num{background:var(--a);color:#1a1300}
+.steprow .body{flex:1;min-width:0}
+.steprow .body p{margin:0 0 4px}
+.steprow .vals{font-size:13px;color:var(--mut)}
+.steprow .vals b{color:var(--ink)}
+.steprow.dec .vals b{color:var(--good)}
+.steprow .note{font-size:12px;color:var(--mut);display:block;margin-top:2px}
+.banner{background:#232d47;border-radius:9px;padding:8px 12px;margin:8px 0;font-size:13px;color:var(--a);font-weight:600}
+.verdict{margin:10px 0 4px;font-size:14px}
 @media(max-width:600px){th,td{padding:7px 4px;font-size:12px}th:first-child,td:first-child{padding-left:8px}}
 </style></head><body>
 <main>
 <nav aria-label="Site navigation" class="nav"><a href="./">&larr; Big 12 tools</a><a href="opponents.html">Opponent win %</a><a href="cfp.html">CFP schedules &amp; odds</a><a href="thieves.html">Bid thieves</a><a href="tv.html">BYU rooting guide</a></nav>
 <h1>Common opponents</h1>
-<p class="intro">BYU is the starting point - add any other Big 12 teams and see which conference opponents <b>every</b> selected team shares, which ones only some of them face, and each team's result against them. This is the raw material for tiebreak step B (record against common conference opponents).</p>
+<p class="intro">BYU is the starting point - add any other Big 12 teams and see which conference opponents <b>every</b> selected team shares, which ones only some of them face, and each team's result against them. Then the <b>tiebreaker walkthrough</b> below runs every leg of the official procedure for your group, numbered 1 to the end, three-way ties and restarts included.</p>
 <p class="fine">Official source: <a href="https://big12sports.com/sports/2024/9/6/FB_0906243427.aspx?path=football" target="_blank" rel="noopener">Big 12 Football Championship Tiebreaker Policies</a> and the <a href="https://big12sports.com/documents/2025/11/4/Big_12_Football_2024_Tiebreaker_Policy.pdf" target="_blank" rel="noopener">16-team policy PDF</a>. Step B only decides between teams still tied after head-to-head, and only final standings are official - midseason this is informational, and games not played yet don't count.</p>
 
 <div class="card"><span class="lead">Compare these teams</span><div class="chips" id="chips"></div><p class="fine" style="margin:8px 0 0">Tap teams to add or remove them. Your picks from the <a href="opponents.html">Opponent win %</a> page count as results here (marked with a dashed underline).</p></div>
@@ -86,6 +98,171 @@ function cellHTML(g){
  return '<td><span class="'+(g.pick?"pk ":"")+cls+'" title="'+(g.pick?"Your pick from the Opponent win % page":"Final")+'">'+g.st+"</span>"+(g.home?"":' <span class="cov" style="display:inline">@</span>')+"</td>";
 }
 
+// ---- tiebreaker walkthrough: every leg of the official procedure, numbered ----
+function fmtPct(p){return (p*100).toFixed(1)+"%"}
+function walkData(){
+ const opps={};B12T.forEach(t=>opps[t]=[]);
+ SD.done.forEach(g=>{opps[g[0]].push(g[1]);opps[g[1]].push(g[0])});
+ SD.rem.forEach(g=>{opps[g[0]].push(g[1]);opps[g[1]].push(g[0])});
+ const rec={},recDone={};B12T.forEach(t=>{rec[t]=[0,0];recDone[t]=[0,0]});
+ SD.done.forEach(g=>{const[a,h,aw]=g;if(aw){rec[a][0]++;rec[h][1]++;recDone[a][0]++;recDone[h][1]++}else{rec[h][0]++;rec[a][1]++;recDone[h][0]++;recDone[a][1]++}});
+ SD.rem.forEach((g,i)=>{const p=picks[i];if(!p)return;const[a,h]=g;if(p=="a"){rec[a][0]++;rec[h][1]++}else{rec[h][0]++;rec[a][1]++}});
+ const pool={};B12T.forEach(t=>{let w=0,n=0;opps[t].forEach(o=>{w+=rec[o][0];n+=rec[o][0]+rec[o][1]});pool[t]={w,n,pct:n?w/n:0}});
+ const fin={};B12T.forEach(t=>{const o=SD.ovr[t]||[0,0];fin[t]=[o[0]+(rec[t][0]-recDone[t][0]),o[1]+(rec[t][1]-recDone[t][1])]});
+ const g={};B12T.forEach(t=>g[t]=[]);
+ SD.done.forEach(gm=>{const[a,h,aw]=gm;g[aw?a:h].push({opp:aw?h:a,won:1});g[aw?h:a].push({opp:aw?a:h,won:0})});
+ SD.rem.forEach((gm,i)=>{const p=picks[i];if(!p)return;const[a,h]=gm;g[p=="a"?a:h].push({opp:p=="a"?h:a,won:1});g[p=="a"?h:a].push({opp:p=="a"?a:h,won:0})});
+ return{rec,pool,fin,g};
+}
+function wpVs(g,t,ops){const gs=g[t].filter(x=>ops.indexOf(x.opp)>=0);if(!gs.length)return null;return gs.reduce((s,x)=>s+x.won,0)/gs.length}
+function recVs(g,t,ops){const gs=g[t].filter(x=>ops.indexOf(x.opp)>=0);const w=gs.reduce((s,x)=>s+x.won,0);return w+"-"+(gs.length-w)}
+function bestOf(cand,vals){let best=-2,out=[],any=false;cand.forEach(t=>{const v=vals[t];if(v==null)return;any=true;if(v>best+1e-9){best=v;out=[t]}else if(Math.abs(v-best)<=1e-9)out.push(t)});return any?{win:out,best}:null}
+// one round of the official procedure; steps carry their official letters
+function resolveRound(pool,cur){
+ const g=cur.g,fin=cur.fin,rec=cur.rec,poolD=cur.pool;
+ const steps=[];let cand=pool.slice();
+ function push(ltr,name,rows,note,decided,marker){steps.push({ltr,name,rows,note,decided,marker:!!marker})}
+ if(cand.length==2){
+  const a=cand[0],b=cand[1],pa=wpVs(g,a,[b]),pb=wpVs(g,b,[a]);
+  const remIdx=SD.rem.findIndex((gm,i)=>((gm[0]==a&&gm[1]==b)||(gm[0]==b&&gm[1]==a)));
+  let rows,note="",decided=false;
+  if(pa!=null&&pb!=null){
+   const w=pa>pb?a:pa<pb?b:null;
+   rows=[{t:a,txt:pa>pb?"beat "+b:pa<pb?"lost to "+b:"tied",best:w==a},{t:b,txt:pb>pa?"beat "+a:pb<pa?"lost to "+a:"tied",best:w==b}];
+   if(w){cand=[w];decided=true}
+  }else{
+   rows=[{t:a,txt:"no game played",best:false},{t:b,txt:"no game played",best:false}];
+   if(remIdx>=0&&SD.rem[remIdx]&&!picks[remIdx]){
+    note="They haven't played - they meet "+fmtDate(SD.rem[remIdx][2])+". Pick that game on the Opponent win % page to count it.";
+   }else note="They don't play each other this season.";
+  }
+  push("A","Head-to-head",rows,note,decided);
+ }else{
+  const playedAll=cand.every(t=>cand.every(o=>o==t||g[t].some(x=>x.opp==o)));
+  let rows,note="",decided=false;
+  if(playedAll){
+   const v={};cand.forEach(t=>v[t]=wpVs(g,t,cand.filter(o=>o!=t)));
+   const r=bestOf(cand,v);
+   rows=cand.map(t=>({t,txt:recVs(g,t,cand.filter(o=>o!=t))+" ("+fmtPct(v[t])+")",best:r&&r.win.indexOf(t)>=0}));
+   if(r){cand=r.win;if(cand.length==1)decided=true}
+  }else{
+   const sweep=cand.find(t=>cand.every(o=>o==t||(g[t].some(x=>x.opp==o)&&g[t].filter(x=>x.opp==o).every(x=>x.won))));
+   if(sweep){
+    rows=cand.map(t=>({t,txt:t==sweep?"beat every other tied team":"did not sweep",best:t==sweep}));
+    cand=[sweep];decided=true;
+   }else{
+    rows=cand.map(t=>({t,txt:"didn't play everyone in the tie",best:false}));
+    note="Not everyone in the tie played each other and nobody beat all the others - the rules skip to step B.";
+   }
+  }
+  push("A","Record in games among the tied teams",rows,note,decided);
+ }
+ if(cand.length==2&&pool.length>2)return restartTwo(cand,steps,cur);
+ if(cand.length>1){
+  // step B: common conference opponents
+  const common=B12T.filter(o=>cand.indexOf(o)<0&&cand.every(t=>g[t].some(x=>x.opp==o)));
+  let rows,note="",decided=false;
+  if(!common.length){
+   rows=cand.map(t=>({t,txt:"-",best:false}));
+   note="No opponent every tied team has played yet - the rules move on.";
+  }else{
+   const v={};cand.forEach(t=>v[t]=wpVs(g,t,common));
+   const r=bestOf(cand,v);
+   rows=cand.map(t=>({t,txt:recVs(g,t,common)+" ("+fmtPct(v[t])+")",best:r&&r.win.indexOf(t)>=0}));
+   note="vs "+common.join(", ");
+   if(r){cand=r.win;if(cand.length==1)decided=true}
+  }
+  push("B","Record vs common conference opponents",rows,note,decided);
+ }
+ if(cand.length==2&&pool.length>2)return restartTwo(cand,steps,cur);
+ if(cand.length>1){
+  // step C: walk down the standings to the next-highest common opponent (tied groups count collectively)
+  const pct=t=>rec[t][0]/(rec[t][0]+rec[t][1]);
+  const order=B12T.slice().sort((x,y)=>pct(y)-pct(x));
+  const groups=[];order.forEach(t=>{const gp=groups.find(gr=>Math.abs(pct(gr[0])-pct(t))<1e-9);if(gp)gp.push(t);else groups.push([t])});
+  let rows=null,note="",decided=false,used=null;
+  const walked=[];
+  for(const grp of groups){
+   const ops=grp.filter(t=>cand.indexOf(t)<0);if(!ops.length)continue;
+   if(!cand.every(t=>g[t].some(x=>ops.indexOf(x.opp)>=0)))continue;
+   used=ops;
+   const v={};cand.forEach(t=>v[t]=wpVs(g,t,ops));
+   const r=bestOf(cand,v);
+   if(r&&r.win.length<cand.length){
+    rows=cand.map(t=>({t,txt:recVs(g,t,ops)+" ("+fmtPct(v[t])+")",best:r.win.indexOf(t)>=0}));
+    cand=r.win;if(cand.length==1)decided=true;
+    break;
+   }
+   walked.push(ops.join(" + "));
+  }
+  if(!rows){
+   rows=cand.map(t=>({t,txt:"-",best:false}));
+   note=walked.length?"Even against every common opponent down the standings ("+walked.join("; then ")+") - the rules move on.":"No placement in the standings where every tied team has played the same opponent(s) yet - the rules move on.";
+  }else{
+   note="vs the highest-placed common opponent"+(used.length>1?"s (counted as one tied group)":"")+": "+used.join(", ")+(walked.length?". Even vs "+walked.join("; then ")+" higher up, so the walk continued.":"");
+  }
+  push("C","Record vs the next-highest common opponent",rows,note,decided);
+ }
+ if(cand.length==2&&pool.length>2)return restartTwo(cand,steps,cur);
+ if(cand.length>1){
+  // step D: strength of conference schedule
+  const v={};cand.forEach(t=>v[t]=poolD[t].n?poolD[t].pct:null);
+  const r=bestOf(cand,v);
+  const rows=cand.map(t=>({t,txt:poolD[t].w+"-"+(poolD[t].n-poolD[t].w)+" ("+fmtPct(poolD[t].pct)+")",best:r&&r.win.indexOf(t)>=0}));
+  let decided=false;
+  if(r){cand=r.win;if(cand.length==1)decided=true}
+  push("D","Strength of conference schedule (opponent win %)",rows,"Combined conference record of each team's conference opponents, picks included.",decided);
+ }
+ if(cand.length==2&&pool.length>2)return restartTwo(cand,steps,cur);
+ if(cand.length>1){
+  // step E: total wins
+  const v={};cand.forEach(t=>v[t]=fin[t][0]);
+  const r=bestOf(cand,v);
+  const rows=cand.map(t=>({t,txt:fin[t][0]+" win"+(fin[t][0]==1?"":"s")+" ("+fin[t][0]+"-"+fin[t][1]+" overall)",best:r&&r.win.indexOf(t)>=0}));
+  let decided=false;
+  if(r){cand=r.win;if(cand.length==1)decided=true}
+  push("E","Total wins in the 12-game season",rows,"Counts your picks. Fine print not applied: max one FCS win (no Big 12 team has more than one this season) and NCAA-exempt games.",decided);
+ }
+ if(cand.length==2&&pool.length>2)return restartTwo(cand,steps,cur);
+ if(cand.length>1){
+  push("F/G","SportSource Analytics rating, then a coin toss",cand.map(t=>({t,txt:"still tied",best:false})),"Not computable on this page - the official order falls through to these.",false);
+ }
+ return{winner:cand.length==1?cand[0]:null,left:cand,steps};
+}
+function restartTwo(cand,steps,cur){
+ const sub=resolveRound(cand,cur);
+ steps.push({ltr:"",name:"",rows:[],note:"The tie is down to two teams - the official rules switch to the two-team procedure and restart at step A.",decided:false,marker:true});
+ sub.steps.forEach(s=>steps.push(s));
+ return{winner:sub.winner,left:sub.left,steps};
+}
+// flatten the whole resolution into a single ordered list of legs
+function buildLegs(group,cur){
+ const legs=[];let pool=group.slice(),slot=0;
+ while(pool.length>1){
+  const r=resolveRound(pool,cur);
+  r.steps.forEach(s=>{
+   if(s.marker)legs.push({kind:"banner",txt:s.note});
+   else legs.push({kind:"step",ltr:s.ltr,name:s.name,rows:s.rows,note:s.note,decided:s.decided});
+  });
+  if(r.winner){
+   slot++;
+   const rest=pool.filter(t=>t!=r.winner);
+   legs.push({kind:"outcome",dead:false,txt:"Slot #"+slot+" of the group: "+r.winner+"."+(rest.length>1?" The remaining "+rest.length+" teams restart the procedure from the beginning ("+(rest.length>2?"step A":"the two-team list")+").":"")});
+   pool=rest;
+  }else{
+   legs.push({kind:"outcome",dead:true,txt:"No on-field separation for "+r.left.join(", ")+" - under the official order this falls to the SportSource Analytics rating, then a coin toss."});
+   pool=[];
+  }
+ }
+ if(pool.length==1)legs.push({kind:"outcome",dead:false,txt:pool[0]+" takes the last slot of the group."});
+ return legs;
+}
+function legHTML(l,n){
+ if(l.kind=="banner")return '<div class="banner">'+l.txt+'</div>';
+ if(l.kind=="outcome")return '<div class="verdict"><b class="'+(l.dead?"losing":"winning")+'">'+l.txt+'</b></div>';
+ return '<div class="steprow'+(n==1?" first":"")+(l.decided?" dec":"")+'"><div class="num">'+n+'</div><div class="body"><p><b>'+l.name+'</b> <span class="note" style="display:inline">(official step '+l.ltr+')</span></p><div class="vals">'+l.rows.map(r=>'<b>'+r.t+'</b> '+r.txt).join(' &middot; ')+'</div>'+(l.note?'<span class="note">'+l.note+'</span>':'')+(l.decided?'<span class="note" style="color:var(--good)">Decided here.</span>':'')+'</div></div>';
+}
+
 function render(){
  // chips
  const ch=$("chips");ch.innerHTML="";
@@ -129,6 +306,19 @@ function render(){
   h+='<p class="sumline" style="margin-top:6px">No conference opponent is on every selected team&#8217;s schedule'+(sel.length==2?" yet":"")+".</p>";
  }
  h+='<p class="fine" style="margin:6px 0 0">'+common.length+" common &middot; "+uncommon.length+' not shared by all. In the official procedure this record is step B, compared only between teams still tied after head-to-head.</p></div>';
+
+ // tiebreaker walkthrough for the selected group, every leg numbered
+ {
+  const cur=walkData();
+  const legs=buildLegs(sel.slice(),cur);
+  const wp=sel.map(t=>{const r=cur.rec[t];return t+" "+r[0]+"-"+r[1]});
+  const p0=cur.rec[sel[0]][0]/(cur.rec[sel[0]][0]+cur.rec[sel[0]][1]);
+  const tiedNow=sel.every(t=>Math.abs(cur.rec[t][0]/(cur.rec[t][0]+cur.rec[t][1])-p0)<1e-9);
+  let n=0;
+  h+='<h2>Tiebreaker walkthrough, leg by leg</h2>';
+  h+='<p class="fine">'+(tiedNow?"These "+sel.length+" teams are tied right now ("+wp.join(", ")+", played games plus your picks), so this is the live order of operations.":"Right now these teams are not tied ("+wp.join(", ")+", played games plus your picks) - this is the what-if if they finish level.")+' Legs are numbered 1 to the end, with the official step letter in parentheses. When a tie of 3+ breaks one team off, the rest restart; down to two, the rules switch to the two-team list. Games not played (or picked) don&#8217;t count. Steps F/G can&#8217;t be computed here.</p>';
+  h+='<div class="card">'+legs.map(l=>l.kind=="step"?legHTML(l,++n):legHTML(l,0)).join("")+'</div>';
+ }
 
  // head-to-head within the group
  if(h2h.length){
