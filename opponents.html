@@ -115,7 +115,7 @@ function render(){
  const mf=minFlips(cur,opps);
  let mfTxt;
  if(diff>0)mfTxt=`BYU is ahead on this lever${nPicks?` with your ${nPicks} change${nPicks>1?"s":""}`:""}.`;
- else if(mf){mfTxt=`Fewest ${nPicks?"more ":""}result${mf.length>1?"s":""} to flip for BYU to pass Houston: <b>${mf.length}</b> - `+mf.map(x=>`${x.w} over ${x.l} (${new Date(x.g.d+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"})})`).join("; ")+"."}
+ else if(mf){mfTxt=`Fewest remaining-game results that would need to go BYU's way for BYU to pass Houston${nPicks?", on top of your changes":""}: <b>${mf.length}</b> - `+mf.map(x=>`${x.w} over ${x.l} (${new Date(x.g.d+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"})})`).join("; ")+". Computed from the current state shown above: it counts only the tagged games below (games involving one of the two teams' opponents); every other remaining result is left undecided, not assumed."}
  else mfTxt=`Even flipping every remaining lever would not put BYU ahead - the gap is too big now.`;
  $("spot").innerHTML=`<div class="lead">Tiebreak step D - the comparison you asked about</div>
  <div class="vs" style="margin-top:8px">
