@@ -67,7 +67,7 @@ function g5Slot(){
 function render(){
  const b=T[BYU];
  $("byu").innerHTML=`<div class="lead">BYU checkpoint</div>
- <div style="font-size:18px;font-weight:700;margin-top:4px">BYU - CFP #${b.cfp} <span style="color:var(--mut);font-weight:400;font-size:13px">(Nov ${SNAP.cfpDate}, through Oct 31)</span> &middot; AP #${b.ap} &middot; ${b.ow}-${b.ol} overall, ${b.cw}-${b.cl} in the Big 12</div>
+ <div style="font-size:18px;font-weight:700;margin-top:4px">BYU - CFP #${b.cfp} <span style="color:var(--mut);font-weight:400;font-size:13px">(${SNAP.cfpDate}, through Oct 31)</span> &middot; AP #${b.ap} &middot; ${b.ow}-${b.ol} overall, ${b.cw}-${b.cl} in the Big 12</div>
  <div class="fine" style="margin-top:4px">FPI gives BYU a ${b.wc}% shot at the Big 12 title (automatic bid) and ${b.po}% to make the playoff. BYU lost at Utah on Nov 7 after these rankings - the Nov 10 refresh will move things.</div>`;
  let ch="";
  [...P4,...G5].forEach(ck=>{
