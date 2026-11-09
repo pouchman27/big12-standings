@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Common opponents: compare any teams | Big 12 Standings &amp; Scenarios</title>
+<meta content="Pick BYU and any set of Big 12 teams to see shared and unshared conference opponents, with each team's results - the raw material for tiebreak step B." name="description"/>
+<style>
+:root{--bg:#0f1420;--card:#192033;--ink:#eef2fb;--mut:#a7b3cc;--a:#f5b700;--b:#4cc3ff;--rule:#2c3858;--good:#3ddc84;--bad:#ff6b6b}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+main{max-width:1000px;margin:0 auto;padding:16px}
+a{color:var(--b)}.nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.nav a{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:8px 12px;text-decoration:none;color:var(--ink)}
+h1{font-size:24px;margin:8px 0}h2{font-size:18px;margin:28px 0 8px;color:var(--a)}.intro,.fine{color:var(--mut)}.fine{font-size:13px}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:14px;margin:14px 0}
+.lead{color:var(--mut);font-size:12px;font-weight:400;text-transform:uppercase;letter-spacing:.08em}
+.winning{color:var(--good)}.losing{color:var(--bad)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{cursor:pointer;border:1px solid var(--rule);border-radius:8px;padding:6px 11px;user-select:none;font-size:14px}
+.chip.on{background:var(--a);color:#1a1300;font-weight:700;border-color:var(--a)}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px}
+th,td{text-align:center;padding:9px 10px;border-bottom:1px solid var(--rule);font-size:14px}th{color:var(--mut);font-size:12px}
+th:first-child,td:first-child{text-align:left}
+td.mut{color:var(--mut)}
+.pk{border-bottom:2px dashed var(--b)}
+.oppname{font-weight:600}.opprec{font-size:12px;color:var(--mut);font-weight:400}
+.cov{font-size:11px;color:var(--mut);display:block}
+.grouprow td{background:#232d47;color:var(--a);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;text-align:left}
+.h2h{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:9px 10px;margin:6px 0;font-size:14px}
+.h2h .at{color:var(--mut);font-size:12px}
+.sumline{font-size:15px;margin:6px 0}
+.sumline b{color:var(--ink)}
+.pill{display:inline-block;background:#232d47;border-radius:7px;padding:3px 9px;margin:3px 4px 3px 0;font-size:13px}
+@media(max-width:600px){th,td{padding:7px 4px;font-size:12px}th:first-child,td:first-child{padding-left:8px}}
+</style></head><body>
+<main>
+<nav aria-label="Site navigation" class="nav"><a href="./">&larr; Big 12 tools</a><a href="opponents.html">Opponent win %</a><a href="cfp.html">CFP schedules &amp; odds</a><a href="thieves.html">Bid thieves</a><a href="tv.html">BYU rooting guide</a></nav>
+<h1>Common opponents</h1>
+<p class="intro">BYU is the starting point - add any other Big 12 teams and see which conference opponents <b>every</b> selected team shares, which ones only some of them face, and each team's result against them. This is the raw material for tiebreak step B (record against common conference opponents).</p>
+<p class="fine">Official source: <a href="https://big12sports.com/sports/2024/9/6/FB_0906243427.aspx?path=football" target="_blank" rel="noopener">Big 12 Football Championship Tiebreaker Policies</a> and the <a href="https://big12sports.com/documents/2025/11/4/Big_12_Football_2024_Tiebreaker_Policy.pdf" target="_blank" rel="noopener">16-team policy PDF</a>. Step B only decides between teams still tied after head-to-head, and only final standings are official - midseason this is informational, and games not played yet don't count.</p>
+
+<div class="card"><span class="lead">Compare these teams</span><div class="chips" id="chips"></div><p class="fine" style="margin:8px 0 0">Tap teams to add or remove them. Your picks from the <a href="opponents.html">Opponent win %</a> page count as results here (marked with a dashed underline).</p></div>
+
+<div id="out"></div>
+
+<p class="fine" id="src"></p>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const IDM={"12":"Arizona","197":"Oklahoma State","2116":"UCF","2132":"Cincinnati","2305":"Kansas","2306":"Kansas State","239":"Baylor","248":"Houston","252":"BYU","254":"Utah","2628":"TCU","2641":"Texas Tech","277":"West Virginia","38":"Colorado","66":"Iowa State","9":"Arizona State"};
+const B12T=Object.values(IDM).sort();
+const SNAP={"done":[["Arizona State","BYU",0],["Arizona State","Kansas",1],["Arizona State","Texas Tech",0],["Arizona","BYU",0],["Arizona","Texas Tech",0],["Arizona","West Virginia",1],["BYU","TCU",1],["BYU","UCF",0],["BYU","Utah",0],["Baylor","Arizona State",1],["Baylor","Kansas",0],["Baylor","UCF",1],["Cincinnati","Arizona",0],["Cincinnati","Houston",0],["Cincinnati","West Virginia",0],["Colorado","Arizona State",0],["Colorado","Baylor",0],["Colorado","Oklahoma State",0],["Houston","Kansas State",1],["Houston","Texas Tech",0],["Houston","Utah",0],["Iowa State","Arizona",0],["Iowa State","BYU",0],["Iowa State","Baylor",0],["Kansas State","Arizona State",0],["Kansas State","Cincinnati",0],["Kansas State","Colorado",0],["Kansas","Kansas State",0],["Kansas","TCU",0],["Kansas","Utah",0],["Oklahoma State","Houston",0],["Oklahoma State","Iowa State",0],["Oklahoma State","Kansas State",1],["Oklahoma State","West Virginia",1],["TCU","Arizona",0],["TCU","Baylor",1],["TCU","UCF",0],["Texas Tech","Cincinnati",0],["Texas Tech","Colorado",1],["UCF","Houston",0],["UCF","Kansas",1],["UCF","Oklahoma State",0],["Utah","Cincinnati",1],["Utah","Colorado",1],["Utah","Iowa State",1],["West Virginia","Iowa State",0],["West Virginia","TCU",1],["West Virginia","Texas Tech",0]],"rem":[["Houston","Colorado","2026-11-13"],["Cincinnati","Iowa State","2026-11-14"],["Kansas State","TCU","2026-11-14"],["Baylor","BYU","2026-11-14"],["Arizona State","UCF","2026-11-14"],["Kansas","West Virginia","2026-11-14"],["Utah","Arizona","2026-11-14"],["Texas Tech","Oklahoma State","2026-11-14"],["Iowa State","UCF","2026-11-20"],["Utah","TCU","2026-11-21"],["BYU","Kansas","2026-11-21"],["Texas Tech","Baylor","2026-11-21"],["Houston","West Virginia","2026-11-21"],["Arizona","Kansas State","2026-11-21"],["Colorado","Cincinnati","2026-11-21"],["Oklahoma State","Arizona State","2026-11-21"],["TCU","Texas Tech","2026-11-26"],["West Virginia","Utah","2026-11-27"],["Cincinnati","BYU","2026-11-28"],["Baylor","Houston","2026-11-28"],["Arizona State","Arizona","2026-11-28"],["UCF","Colorado","2026-11-28"],["Kansas","Oklahoma State","2026-11-28"],["Kansas State","Iowa State","2026-11-28"]],"ovr":{"TCU":[4,5],"Utah":[9,0],"UCF":[5,4],"Colorado":[3,6],"Kansas":[3,6],"Texas Tech":[8,1],"BYU":[7,2],"Houston":[7,2],"West Virginia":[5,4],"Iowa State":[4,5],"Baylor":[6,3],"Cincinnati":[5,4],"Oklahoma State":[6,3],"Kansas State":[4,5],"Arizona":[7,2],"Arizona State":[5,4]},"asof":"Nov 9, 2026"};
+let SD={done:SNAP.done,rem:SNAP.rem,ovr:SNAP.ovr,asof:SNAP.asof};
+let picks={};
+try{picks=JSON.parse(localStorage.getItem("b12oppPicks")||"{}")||{}}catch(e){picks={}}
+const OLD_REM=[["Houston","Colorado","2026-11-14"],["Cincinnati","Iowa State","2026-11-14"],["Kansas State","TCU","2026-11-14"],["Baylor","BYU","2026-11-14"],["Arizona State","UCF","2026-11-14"],["Kansas","West Virginia","2026-11-14"],["Utah","Arizona","2026-11-15"],["Texas Tech","Oklahoma State","2026-11-15"],["Iowa State","UCF","2026-11-20"],["Utah","TCU","2026-11-21"],["BYU","Kansas","2026-11-21"],["Texas Tech","Baylor","2026-11-21"],["Houston","West Virginia","2026-11-21"],["Arizona","Kansas State","2026-11-21"],["Colorado","Cincinnati","2026-11-21"],["Oklahoma State","Arizona State","2026-11-21"],["TCU","Texas Tech","2026-11-27"],["West Virginia","Utah","2026-11-28"],["Cincinnati","BYU","2026-11-28"],["Baylor","Houston","2026-11-28"],["Arizona State","Arizona","2026-11-28"],["UCF","Colorado","2026-11-28"],["Kansas","Oklahoma State","2026-11-28"],["Kansas State","Iowa State","2026-11-28"]];
+try{if(!localStorage.getItem("b12oppPicksV2")){
+ const ci={};SD.rem.forEach((g,i)=>ci[g[0]+"@"+g[1]]=i);
+ const np={};Object.keys(picks).forEach(i=>{const og=OLD_REM[i];const ni=og?ci[og[0]+"@"+og[1]]:null;if(ni!=null)np[ni]=picks[i]});
+ picks=np;localStorage.setItem("b12oppPicksV2","1");localStorage.setItem("b12oppPicks",JSON.stringify(picks));
+}}catch(e){}
+
+let sel=["BYU"];
+try{const s=JSON.parse(localStorage.getItem("b12commonSel")||"null");if(Array.isArray(s)&&s.length)sel=s.filter(t=>B12T.indexOf(t)>=0);if(!sel.length)sel=["BYU"]}catch(e){}
+function saveSel(){try{localStorage.setItem("b12commonSel",JSON.stringify(sel))}catch(e){}}
+
+// conference record from played games only
+const rec={};B12T.forEach(t=>rec[t]=[0,0]);
+SD.done.forEach(g=>{const[a,h,aw]=g;if(aw){rec[a][0]++;rec[h][1]++}else{rec[h][0]++;rec[a][1]++}});
+function recStr(t){return rec[t][0]+"-"+rec[t][1]}
+function recPct(t){const n=rec[t][0]+rec[t][1];return n?rec[t][0]/n:0}
+
+// every conference game for team t, keyed by opponent
+function teamGames(t){
+ const m={};
+ SD.done.forEach(g=>{const[a,h,aw]=g;
+  if(a==t)m[h]={st:aw?"W":"L",home:false,pick:false};
+  else if(h==t)m[a]={st:aw?"L":"W",home:true,pick:false}});
+ SD.rem.forEach((g,i)=>{const[a,h,d]=g;const p=picks[i];
+  if(a==t)m[h]=p?{st:p=="a"?"W":"L",home:false,pick:true,date:d,idx:i}:{st:"P",home:false,date:d,idx:i};
+  else if(h==t)m[a]=p?{st:p=="h"?"W":"L",home:true,pick:true,date:d,idx:i}:{st:"P",home:true,date:d,idx:i}});
+ return m;
+}
+function fmtDate(d){return new Date(d+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"})}
+
+function cellHTML(g){
+ if(!g)return '<td class="mut">&mdash;</td>';
+ if(g.st=="P")return '<td class="mut">'+fmtDate(g.date)+(g.home?"":" @")+"</td>";
+ const cls=g.st=="W"?"winning":"losing";
+ return '<td><span class="'+(g.pick?"pk ":"")+cls+'" title="'+(g.pick?"Your pick from the Opponent win % page":"Final")+'">'+g.st+"</span>"+(g.home?"":' <span class="cov" style="display:inline">@</span>')+"</td>";
+}
+
+function render(){
+ // chips
+ const ch=$("chips");ch.innerHTML="";
+ B12T.forEach(t=>{
+  const s=document.createElement("span");s.className="chip"+(sel.indexOf(t)>=0?" on":"");s.textContent=t;
+  s.onclick=()=>{const i=sel.indexOf(t);if(i>=0)sel.splice(i,1);else sel.push(t);saveSel();render()};
+  ch.appendChild(s);
+ });
+ const out=$("out");
+ if(sel.length<2){out.innerHTML='<div class="card">Pick at least one team to compare with '+(sel.length?sel[0]:"BYU")+".</div>";$("src").textContent="Schedule data as of "+SD.asof+".";return}
+
+ const maps={};sel.forEach(t=>maps[t]=teamGames(t));
+ const inSel={};sel.forEach(t=>inSel[t]=1);
+
+ // games among the selected teams (head-to-head material, step A - not common opponents)
+ const h2h=[];
+ SD.done.forEach(g=>{if(inSel[g[0]]&&inSel[g[1]])h2h.push({a:g[0],h:g[1],done:true,aw:g[2]})});
+ SD.rem.forEach((g,i)=>{if(inSel[g[0]]&&inSel[g[1]])h2h.push({a:g[0],h:g[1],done:false,d:g[2],idx:i})});
+
+ // opponent coverage
+ const cov={};
+ sel.forEach(t=>{Object.keys(maps[t]).forEach(o=>{if(inSel[o])return;(cov[o]=cov[o]||[]).push(t)})});
+ const opps=Object.keys(cov);
+ const common=opps.filter(o=>cov[o].length==sel.length).sort((x,y)=>recPct(y)-recPct(x)||x.localeCompare(y));
+ const uncommon=opps.filter(o=>cov[o].length<sel.length).sort((x,y)=>cov[y].length-cov[x].length||recPct(y)-recPct(x)||x.localeCompare(y));
+
+ let h="";
+
+ // summary card
+ h+='<div class="card"><span class="lead">Shared by all '+sel.length+' teams</span>';
+ if(common.length){
+  h+='<div style="margin-top:6px">'+common.map(o=>'<span class="pill">'+o+' <span class="opprec">'+recStr(o)+"</span></span>").join("")+"</div>";
+  // record vs common opponents, decided games only
+  const parts=sel.map(t=>{
+   let w=0,l=0,p=0;
+   common.forEach(o=>{const g=maps[t][o];if(!g)return;if(g.st=="W")w++;else if(g.st=="L")l++;else p++});
+   return "<b>"+t+"</b> "+w+"-"+l+(p?' <span class="cov" style="display:inline">('+p+" pending)</span>":"");
+  });
+  h+='<p class="sumline" style="margin-top:10px">Record vs shared opponents (decided games only): '+parts.join(" &middot; ")+"</p>";
+ }else{
+  h+='<p class="sumline" style="margin-top:6px">No conference opponent is on every selected team&#8217;s schedule'+(sel.length==2?" yet":"")+".</p>";
+ }
+ h+='<p class="fine" style="margin:6px 0 0">'+common.length+" common &middot; "+uncommon.length+' not shared by all. In the official procedure this record is step B, compared only between teams still tied after head-to-head.</p></div>';
+
+ // head-to-head within the group
+ if(h2h.length){
+  h+='<h2>Games within the group</h2><p class="fine">These are head-to-head (step A), not common opponents.</p>';
+  h2h.forEach(g=>{
+   if(g.done){const w=g.aw?g.a:g.h,l=g.aw?g.h:g.a;h+='<div class="h2h"><span><b class="winning">'+w+"</b> beat "+l+"</span></div>"}
+   else{const p=picks[g.idx];let txt=g.a+" @ "+g.h+' <span class="at">'+fmtDate(g.d)+"</span>";
+    if(p){const w=p=="a"?g.a:g.h;txt="<b>"+w+"</b> over "+(p=="a"?g.h:g.a)+' <span class="at">'+fmtDate(g.d)+" - your pick</span>"}
+    h+='<div class="h2h">'+txt+"</div>"}
+  });
+ }
+
+ // matrix
+ h+='<h2>Full opponent matrix</h2><p class="fine">A dash means that team doesn&#8217;t play that opponent this season. Pending dates are unplayed games; picks show as W/L with a dashed underline.</p>';
+ h+='<div class="tw"><table><tr><th>Opponent</th>'+sel.map(t=>"<th>"+t+'<br><span class="opprec">'+recStr(t)+"</span></th>").join("")+"</tr>";
+ function rows(list,label){
+  let r="";
+  if(!list.length)return r;
+  r+='<tr class="grouprow"><td colspan="'+(sel.length+1)+'">'+label+"</td></tr>";
+  list.forEach(o=>{
+   r+="<tr><td>"+o+' <span class="opprec">'+recStr(o)+"</span>"+(cov[o].length<sel.length?'<span class="cov">faced by '+cov[o].length+" of "+sel.length+"</span>":"")+"</td>";
+   sel.forEach(t=>{r+=cellHTML(maps[t][o])});
+   r+="</tr>";
+  });
+  return r;
+ }
+ h+=rows(common,"Common to all "+sel.length);
+ h+=rows(uncommon,"Not shared by all");
+ h+="</table></div>";
+
+ out.innerHTML=h;
+ $("src").textContent="Schedule data as of "+SD.asof+". Conference games only; conference records in parentheses are played games, no picks.";
+}
+render();
+</script>
+</body></html>
