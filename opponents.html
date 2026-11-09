@@ -36,6 +36,8 @@ select{background:var(--card);border:1px solid var(--rule);color:var(--ink);bord
 .steprow .vals{font-size:13px;color:var(--mut)}
 .steprow .vals b{color:var(--ink)}
 .steprow.dec .vals b{color:var(--good)}
+.steprow .vals b.outt{color:var(--mut);text-decoration:line-through}
+.outtag{display:inline-block;font-size:11px;color:var(--mut);border:1px solid var(--rule);border-radius:6px;padding:0 6px;white-space:nowrap}
 .steprow .note{font-size:12px;color:var(--mut);display:block;margin-top:2px}
 .grp{margin:14px 0}
 .grp h3{font-size:15px;margin:0 0 4px}
@@ -145,6 +147,14 @@ function minFlips(cur,opps){
 function wpVs(g,t,ops){const gs=g[t].filter(x=>ops.indexOf(x.opp)>=0);if(!gs.length)return null;return gs.reduce((s,x)=>s+x.won,0)/gs.length}
 function recVs(g,t,ops){const gs=g[t].filter(x=>ops.indexOf(x.opp)>=0);const w=gs.reduce((s,x)=>s+x.won,0);return w+"-"+(gs.length-w)}
 function bestOf(cand,vals){let best=-2,out=[],any=false;cand.forEach(t=>{const v=vals[t];if(v==null)return;any=true;if(v>best+1e-9){best=v;out=[t]}else if(Math.abs(v-best)<=1e-9)out.push(t)});return any?{win:out,best}:null}
+// when leaders pull ahead without anyone being seeded, trailers drop out for THIS slot only and rejoin the restart
+function tagDrops(prevC,win,rows){
+ if(!win||win.length<2||win.length>=prevC.length)return[];
+ const dropped=prevC.filter(t=>win.indexOf(t)<0);
+ rows.forEach(rw=>{if(dropped.indexOf(rw.t)>=0)rw.out=true});
+ return dropped;
+}
+function dropNote(d){return d.join(" and ")+" trail"+(d.length>1?"":"s")+" the leaders - out of the race for this slot, but not seeded and not out of the group: "+(d.length>1?"they":"it")+" rejoin"+(d.length>1?"":"s")+" the restart for the next slot."}
 function resolveRound(pool,cur){
  // one round of the procedure; returns {winner, steps:[{ltr,name,rows:[{t,txt,best}],note,decided}]}
  const g=cur.g,fin=cur.fin,rec=cur.rec,poolD=cur.pool;
@@ -174,7 +184,7 @@ function resolveRound(pool,cur){
    const v={};cand.forEach(t=>v[t]=wpVs(g,t,cand.filter(o=>o!=t)));
    const r=bestOf(cand,v);
    rows=cand.map(t=>({t,txt:recVs(g,t,cand.filter(o=>o!=t))+" ("+fmt(v[t])+")",best:r&&r.win.indexOf(t)>=0}));
-   if(r){cand=r.win;if(cand.length==1)decided=true}
+   if(r){const dr=tagDrops(cand,r.win,rows);if(dr.length)note=dropNote(dr);cand=r.win;if(cand.length==1)decided=true}
   }else{
    const sweep=cand.find(t=>cand.every(o=>o==t||(g[t].some(x=>x.opp==o)&&g[t].filter(x=>x.opp==o).every(x=>x.won))));
    if(sweep){
@@ -200,7 +210,7 @@ function resolveRound(pool,cur){
    const r=bestOf(cand,v);
    rows=cand.map(t=>({t,txt:recVs(g,t,common)+" ("+fmt(v[t])+")",best:r&&r.win.indexOf(t)>=0}));
    note="vs "+common.join(", ");
-   if(r){cand=r.win;if(cand.length==1)decided=true}
+   if(r){const dr=tagDrops(cand,r.win,rows);if(dr.length)note+=" "+dropNote(dr);cand=r.win;if(cand.length==1)decided=true}
   }
   push("B","Record vs common conference opponents",rows,note,decided);
  }
@@ -210,7 +220,7 @@ function resolveRound(pool,cur){
   const pct=t=>rec[t][0]/(rec[t][0]+rec[t][1]);
   const order=B12T.slice().sort((x,y)=>pct(y)-pct(x));
   const groups=[];order.forEach(t=>{const gp=groups.find(gr=>Math.abs(pct(gr[0])-pct(t))<1e-9);if(gp)gp.push(t);else groups.push([t])});
-  let rows=null,note="",decided=false,used=null;
+  let rows=null,note="",decided=false,used=null,dropped=[];
   const walked=[];
   for(const grp of groups){
    const ops=grp.filter(t=>cand.indexOf(t)<0);if(!ops.length)continue;
@@ -220,6 +230,7 @@ function resolveRound(pool,cur){
    const r=bestOf(cand,v);
    if(r&&r.win.length<cand.length){
     rows=cand.map(t=>({t,txt:recVs(g,t,ops)+" ("+fmt(v[t])+")",best:r.win.indexOf(t)>=0}));
+    dropped=tagDrops(cand,r.win,rows);
     cand=r.win;if(cand.length==1)decided=true;
     break;
    }
@@ -229,7 +240,7 @@ function resolveRound(pool,cur){
    rows=cand.map(t=>({t,txt:"-",best:false}));
    note=walked.length?"Even against every common opponent down the standings ("+walked.join("; then ")+") - the rules move on.":"No placement in the standings where every tied team has played the same opponent(s) yet - the rules move on.";
   }else{
-   note="vs the highest-placed common opponent"+(used.length>1?"s (counted as one tied group)":"")+": "+used.join(", ")+(walked.length?". Even vs "+walked.join("; then ")+" higher up, so the walk continued.":"");
+   note="vs the highest-placed common opponent"+(used.length>1?"s (counted as one tied group)":"")+": "+used.join(", ")+(walked.length?". Even vs "+walked.join("; then ")+" higher up, so the walk continued.":"")+(dropped.length?" "+dropNote(dropped):"");
   }
   push("C","Record vs the next-highest common opponent",rows,note,decided);
  }
@@ -239,9 +250,9 @@ function resolveRound(pool,cur){
   const v={};cand.forEach(t=>v[t]=poolD[t].n?poolD[t].pct:null);
   const r=bestOf(cand,v);
   const rows=cand.map(t=>({t,txt:poolD[t].w+"-"+(poolD[t].n-poolD[t].w)+" ("+fmt(poolD[t].pct)+")",best:r&&r.win.indexOf(t)>=0}));
-  let decided=false;
-  if(r){cand=r.win;if(cand.length==1)decided=true}
-  push("D","Strength of conference schedule (opponent win %)",rows,"Combined conference record of each team's conference opponents - the table below.",decided);
+  let decided=false,note="Combined conference record of each team's conference opponents - the table below.";
+  if(r){const dr=tagDrops(cand,r.win,rows);if(dr.length)note+=" "+dropNote(dr);cand=r.win;if(cand.length==1)decided=true}
+  push("D","Strength of conference schedule (opponent win %)",rows,note,decided);
  }
  if(cand.length==2&&pool.length>2)return restartTwo(cand,steps,cur);
  if(cand.length>1){
@@ -249,9 +260,9 @@ function resolveRound(pool,cur){
   const v={};cand.forEach(t=>v[t]=fin[t][0]);
   const r=bestOf(cand,v);
   const rows=cand.map(t=>({t,txt:fin[t][0]+" win"+(fin[t][0]==1?"":"s")+" ("+fin[t][0]+"-"+fin[t][1]+" overall)",best:r&&r.win.indexOf(t)>=0}));
-  let decided=false;
-  if(r){cand=r.win;if(cand.length==1)decided=true}
-  push("E","Total wins in the 12-game season",rows,"Counts your picks. Fine print not applied: max one FCS win (no Big 12 team has more than one this season) and NCAA-exempt games.",decided);
+  let decided=false,note="Counts your picks. Fine print not applied: max one FCS win (no Big 12 team has more than one this season) and NCAA-exempt games.";
+  if(r){const dr=tagDrops(cand,r.win,rows);if(dr.length)note+=" "+dropNote(dr);cand=r.win;if(cand.length==1)decided=true}
+  push("E","Total wins in the 12-game season",rows,note,decided);
  }
  if(cand.length==2&&pool.length>2)return restartTwo(cand,steps,cur);
  if(cand.length>1){
@@ -270,14 +281,14 @@ function resolveGroup(group,cur){
  const rounds=[];let p=group.slice();
  while(p.length>1){
   const r=resolveRound(p,cur);
-  rounds.push(r);
+  rounds.push(Object.assign({pool:p.slice()},r));
   if(!r.winner)break;
   p.splice(p.indexOf(r.winner),1);
  }
  return{rounds,leftover:p};
 }
 function stepHTML(s){
- return `<div class="steprow${s.ltr=="A"?" first":""}${s.decided?" dec":""}"><div class="ltr">${s.ltr}</div><div class="body"><p><b>${s.name}</b></p><div class="vals">${s.rows.map(r=>`<b>${r.t}</b> ${r.txt}`).join(" &middot; ")}</div>${s.note?`<span class="note">${s.note}</span>`:""}${s.decided?`<span class="note" style="color:var(--good)">Decided here.</span>`:""}</div></div>`;
+ return `<div class="steprow${s.ltr=="A"?" first":""}${s.decided?" dec":""}"><div class="ltr">${s.ltr}</div><div class="body"><p><b>${s.name}</b></p><div class="vals">${s.rows.map(r=>`${r.out?'<b class="outt">':'<b>'}${r.t}</b> ${r.txt}${r.out?' <span class="outtag">out for this slot</span>':''}`).join(" &middot; ")}</div>${s.note?`<span class="note">${s.note}</span>`:""}${s.decided?`<span class="note" style="color:var(--good)">Decided here.</span>`:""}</div></div>`;
 }
 function renderPair(cur){
  const a=$("pairA").value||"BYU",b=$("pairB").value||"Houston";
@@ -304,7 +315,7 @@ function renderLadder(cur){
   let s2=start;
   res.rounds.forEach(rd=>{
    html+=`<div class="seedline lead">Seed #${s2}</div>`+rd.steps.map(stepHTML).join("");
-   if(rd.winner)html+=`<div class="verdict"><b class="winning">#${s2}: ${rd.winner}.</b>${rd.left.length>1?" The rest restart from step A.":""}</div>`;
+   if(rd.winner){const rest=rd.pool.filter(t=>t!=rd.winner);html+=`<div class="verdict"><b class="winning">#${s2}: ${rd.winner}.</b>${rest.length>1?` The rest (${rest.join(", ")}) restart from step A.`:""}</div>`}
    else html+=`<div class="verdict"><b class="losing">${rd.left.join(", ")} can't be separated on the field</b> - this would go to the SportSource Analytics rating, then a coin toss.</div>`;
    s2++;
   });
