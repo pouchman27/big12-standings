@@ -34,6 +34,7 @@ tr.gamerow>td{padding:0;border-top:1px solid var(--rule)}
 .tag.qual{background:#1f6f5c;color:#eafff8}
 .tag.bad{background:#f85149;color:#fff}
 .tag.rloss{background:#5a3b46;color:#ffd9dc}
+.tag.loss{background:#3a4560;color:#cdd7ee}
 .ornk{font-variant-numeric:tabular-nums}
 @media(max-width:760px){
  table.resume,table.resume thead,table.resume tbody,table.resume tr,table.resume td,table.resume th{display:block}
@@ -126,7 +127,7 @@ function badCell(m){
  return m.bad.map(b=>esc(b.name)+(b.worst?' <span class="tag bad">bad</span>':'')).join(', ');
 }
 function dateLabel(g){const d=new Date(g.timeValid?g.date:g.date.slice(0,10)+'T12:00:00Z');return d.toLocaleDateString('en-US',{timeZone:g.timeValid?'America/New_York':'UTC',month:'short',day:'numeric'})}
-const TAGS={big:'Big win',qual:'Quality',bad:'Bad loss',rloss:'Ranked loss'};
+const TAGS={big:'Big win',qual:'Quality',bad:'Bad loss',loss:'Unranked loss',rloss:'Ranked loss'};
 function gameRows(t){
  return t.games.map(g=>{
   const venue=g.venue==='away'?'@ ':(g.venue==='N'?'vs (N) ':'vs ');
