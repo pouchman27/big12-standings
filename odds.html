@@ -37,30 +37,31 @@ tr.byu td{background:#1d3a5f}
 <main>
 <nav aria-label="Site navigation" class="nav"><a href="./">&larr; Big 12 tools</a><a class="here" href="odds.html">Playoff odds</a><a href="thieves.html">Bid thieves</a><a href="opponents.html">Opponent win %</a><a href="common.html">Common opponents</a><a href="cfp.html">CFP schedules &amp; odds</a><a href="tv.html">BYU rooting guide</a><a href="resume.html">Resume</a><a href="power.html">Power</a></nav>
 <h1>BYU playoff odds</h1>
-<p class="intro">The centerpiece: where BYU stands, the chance they move up or get jumped, the chance of a home playoff game, and the chance they fall out - from a 10,000-run simulation of the rest of the season, with the bid-thief watch underneath.</p>
+<p class="intro">The centerpiece: where BYU stands, where their playoff seed lands across 10,000 simulated seasons, the chance of a home game, the chance they fall out, and the chase around them - with the bid-thief watch underneath.</p>
 
 <div class="card">
 <div class="lead">Where BYU stands</div>
 <div style="font-size:18px;font-weight:700;margin-top:4px">BYU - CFP #10 <span style="color:var(--mut);font-weight:400;font-size:13px">(Nov 10, 2026 committee rankings)</span> &middot; 7-2 overall, 4-2 in the Big 12</div>
-<div class="fine" style="margin-top:4px">In the 12-team format, seeds 1-4 get a bye, <b>seeds 5-8 host a first-round game on campus</b>, seeds 9-12 go on the road. At #10 BYU is in the field but on the road; the cfb.fyi projected bracket sends them to #7 Miami. Hosting means climbing at least two spots.</div>
+<div class="fine" style="margin-top:4px">In the 12-team format, seeds 1-4 get a bye, <b>seeds 5-8 host a first-round game on campus</b>, seeds 9-12 go on the road. At #10 BYU is in the field but on the road; the cfb.fyi projected bracket sends them to #7 Miami. Hosting means finishing seeded 5-8. Seeds follow the committee ranking, except automatic bids can pull a champion up: their projection seeds Pac-12 champ Boise State #12 despite a #24 ranking.</div>
 </div>
 
-<h2>The four ways this ends</h2>
+<h2>Where BYU's seed lands</h2>
 <div class="card">
-<div class="lead">10,000 simulated seasons - every outcome adds to 100%, so nothing is double-counted</div>
+<div class="lead">Final bracket seed across 10,000 simulated seasons - the buckets add to 100%, so nothing is double-counted</div>
 <div class="grid">
-<div class="stat"><div class="v good">19.9%</div><div class="l">Move up (seeds 1-9) - BYU jumps teams ahead</div></div>
-<div class="stat"><div class="v mid">4.1%</div><div class="l">Stay exactly #10</div></div>
-<div class="stat"><div class="v mid">4.8%</div><div class="l">Jumped, but still in (seeds 11-12)</div></div>
-<div class="stat"><div class="v bad">71.2%</div><div class="l">Fall out of the field</div></div>
+<div class="stat"><div class="v good">19.9%</div><div class="l">Seeds 1-9 - higher than today's #10</div></div>
+<div class="stat"><div class="v mid">4.1%</div><div class="l">Seed 10 - same as today</div></div>
+<div class="stat"><div class="v mid">4.8%</div><div class="l">Seeds 11-12 - lower than today</div></div>
+<div class="stat"><div class="v bad">71.2%</div><div class="l">Out of the field</div></div>
 </div>
 <div class="stacked">
 <div style="width:19.9%;background:#3ddc84">19.9%</div>
 <div style="width:4.1%;background:#f5b700"></div>
 <div style="width:4.8%;background:#e0885a"></div>
-<div style="width:71.2%;background:#ff6b6b">71.2% fall out</div>
+<div style="width:71.2%;background:#ff6b6b">71.2% out</div>
 </div>
-<div class="legend"><span><b style="background:#3ddc84"></b>Move up</span><span><b style="background:#f5b700"></b>Stay #10</span><span><b style="background:#e0885a"></b>Jumped, still in</span><span><b style="background:#ff6b6b"></b>Fall out</span></div>
+<div class="legend"><span><b style="background:#3ddc84"></b>Seeds 1-9</span><span><b style="background:#f5b700"></b>Seed 10</span><span><b style="background:#e0885a"></b>Seeds 11-12</span><span><b style="background:#ff6b6b"></b>Out</span></div>
+<div class="fine" style="margin-top:6px">The model publishes final bracket seeds, not week-to-week committee movement - so these buckets say where BYU lands, not who passes whom.</div>
 </div>
 
 <h2>Home game and bye chances</h2>
@@ -80,15 +81,17 @@ tr.byu td{background:#1d3a5f}
 <div class="bars" id="seedbars"></div>
 </div>
 
-<h2>Getting jumped</h2>
+<h2>Who's chasing BYU</h2>
 <div class="card">
-<div class="lead">Teams ranked behind BYU, by chance to make the field - each one that gets in is a team that jumped them</div>
+<div class="lead">Teams ranked behind BYU, by chance to make the playoff in the same simulation</div>
+<p class="fine" style="margin-top:0">This is the competition for at-large spots, <b>not</b> the probability any one team passes BYU - the model doesn't publish pairwise finish-ahead odds, and both teams can get in with the order unchanged. Boise State's route is mostly the Pac-12 auto bid, not passing BYU in the rankings.</p>
 <table><tr><th></th><th>Team</th><th>Conf</th><th>Make playoff</th><th>Home game</th></tr><tbody id="behind"></tbody></table>
 </div>
 
-<h2>Jumping teams</h2>
+<h2>Who BYU is chasing</h2>
 <div class="card">
-<div class="lead">Teams ranked ahead of BYU, by chance to make the field - the vulnerable ones are who BYU passes</div>
+<div class="lead">Teams ranked ahead of BYU, by chance to make the playoff in the same simulation</div>
+<p class="fine" style="margin-top:0">The low numbers are the vulnerable spots BYU could move into - but this is each team's own make-playoff chance, <b>not</b> the probability BYU passes them.</p>
 <table><tr><th></th><th>Team</th><th>Conf</th><th>Make playoff</th><th>Bye</th></tr><tbody id="ahead"></tbody></table>
 </div>
 
@@ -102,12 +105,12 @@ tr.byu td{background:#1d3a5f}
 <div class="chip">ACC <b>26.0%</b></div>
 <div class="chip">SEC <b>2.0%</b></div>
 </div>
-<div class="fine" style="margin-top:8px">Each conference number is the sum of its ESPN FPI title odds for teams ranked behind BYU in the Nov 10 CFP rankings (only one champion per conference, so those add cleanly; BYU's own 8.3% Big 12 title chance is excluded). The combined &asymp;70% is an approximation that treats the four conference races as independent - FPI's simulations share model correlations, so the true number is somewhat different. Title odds are the Nov 9 FPI snapshot; ranks move weekly, so this changes every Tuesday. <b>Don't add this to the simulation numbers above</b> - thief scenarios are already inside the 71.2% fall-out number; this card just isolates that one risk. Full team-by-team thief odds and champion picks: <a href="thieves.html">Bid thieves</a>.</div>
+<div class="fine" style="margin-top:8px">Each conference number is the sum of its ESPN FPI title odds for teams ranked behind BYU in the Nov 10 CFP rankings (only one champion per conference, so those add cleanly; BYU's own 8.3% Big 12 title chance is excluded). The combined &asymp;70% is an approximation that treats the four conference races as independent - FPI's simulations share model correlations, so the true number is somewhat different. Title odds are the Nov 9 FPI snapshot; ranks move weekly, so this changes every Tuesday. cfb.fyi's bracket applies conference-champion automatic bids, so champion-takes-a-spot scenarios are already reflected in the 28.8% / 71.2% above - this card just isolates that one risk. <b>The two numbers measure different things; don't add them.</b> Full team-by-team thief odds and champion picks: <a href="thieves.html">Bid thieves</a>.</div>
 </div>
 
 <h2>Method and sources</h2>
 <div class="card fine">
-Simulation numbers: <a href="https://cfb.fyi/cfp" target="_blank" rel="noopener">cfb.fyi playoff projection</a> - the rest of the season played out 10,000 times using each game's betting line and team power ratings, snapshot taken Nov 11, 2026. Seed bands: bye = seeds 1-4, home = 5-8, road = 9-12, out = unseeded. Bid-thief math: <a href="https://www.espn.com/college-football/fpi" target="_blank" rel="noopener">ESPN FPI</a> conference-title odds (Nov 9 snapshot) over the <a href="https://collegefootballplayoff.com/rankings" target="_blank" rel="noopener">Nov 10 CFP rankings</a>. These are model outputs, not committee predictions; the committee decides the real rankings every Tuesday.
+Simulation numbers: <a href="https://cfb.fyi/cfp" target="_blank" rel="noopener">cfb.fyi 2026 playoff projection</a> - their words: "We played out the rest of the season 10,000 times using each game's betting line and team power ratings," updated Nov 11, 2026. Their output is final bracket seeds (with automatic bids applied), not committee-rank movement; no source we found publishes the pairwise odds of one specific team passing another, so those aren't on this page. Seed bands: bye = seeds 1-4, home = 5-8, road = 9-12, out = unseeded. Bid-thief math: <a href="https://www.espn.com/college-football/fpi" target="_blank" rel="noopener">ESPN FPI</a> conference-title odds (Nov 9 snapshot) over the <a href="https://collegefootballplayoff.com/rankings" target="_blank" rel="noopener">Nov 10 CFP rankings</a>. These are model outputs, not committee predictions; the committee decides the real rankings every Tuesday.
 </div>
 </main>
 <script>
