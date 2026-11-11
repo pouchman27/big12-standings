@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>BYU playoff odds | Big 12 Standings &amp; Scenarios</title>
+<meta content="BYU's CFP rank, seed odds, home-game and falling-out chances, and the P4 bid-thief watch - from a 10,000-run season simulation, ESPN FPI and the Nov 10 CFP rankings." name="description"/>
+<style>
+:root{--bg:#0f1420;--card:#192033;--ink:#eef2fb;--mut:#a7b3cc;--a:#f5b700;--b:#4cc3ff;--rule:#2c3858;--good:#3ddc84;--bad:#ff6b6b}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+main{max-width:1000px;margin:0 auto;padding:16px}
+a{color:var(--b)}.nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.nav a{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:8px 12px;text-decoration:none;color:var(--ink)}
+.nav a.here{border-color:var(--a)}
+h1{font-size:24px;margin:8px 0}h2{font-size:18px;margin:28px 0 8px;color:var(--a)}h3{font-size:16px;margin:0 0 6px}.intro,.fine{color:var(--mut)}.fine{font-size:13px}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:14px;margin:14px 0}
+.lead{color:var(--mut);font-size:12px;font-weight:400;text-transform:uppercase;letter-spacing:.08em}
+.big{font-size:34px;font-weight:800;line-height:1.1}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
+.stat{background:#131a2b;border:1px solid var(--rule);border-radius:10px;padding:10px 12px}
+.stat .v{font-size:24px;font-weight:800}
+.stat .l{color:var(--mut);font-size:12px;margin-top:2px}
+.good{color:var(--good)}.bad{color:var(--bad)}.mid{color:var(--a)}
+.stacked{display:flex;height:34px;border-radius:8px;overflow:hidden;border:1px solid var(--rule);margin-top:10px}
+.stacked div{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#0f1420;white-space:nowrap;overflow:hidden}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:12px;color:var(--mut)}
+.legend span b{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px}
+.bars{margin-top:8px}
+.brow{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:13px}
+.brow .bl{width:70px;text-align:right;color:var(--mut);white-space:nowrap}
+.brow .bt{height:18px;border-radius:4px;background:var(--b);min-width:2px}
+.brow .bv{width:52px;font-weight:700;white-space:nowrap}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--rule);font-size:14px}th{color:var(--mut);font-size:12px}
+tr.byu td{background:#1d3a5f}
+.rk{display:inline-block;min-width:26px;text-align:center;border-radius:6px;background:#232d47;padding:1px 6px;font-size:12px;margin-right:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{background:#131a2b;border:1px solid var(--rule);border-radius:9px;padding:8px 12px;font-size:14px}
+.chip b{color:var(--b)}
+@media(max-width:600px){th,td{padding:6px 5px;font-size:12px}.big{font-size:26px}.brow .bl{width:56px}}
+</style></head><body>
+<main>
+<nav aria-label="Site navigation" class="nav"><a href="./">&larr; Big 12 tools</a><a class="here" href="odds.html">Playoff odds</a><a href="thieves.html">Bid thieves</a><a href="opponents.html">Opponent win %</a><a href="common.html">Common opponents</a><a href="cfp.html">CFP schedules &amp; odds</a><a href="tv.html">BYU rooting guide</a><a href="resume.html">Resume</a><a href="power.html">Power</a></nav>
+<h1>BYU playoff odds</h1>
+<p class="intro">The centerpiece: where BYU stands, the chance they move up or get jumped, the chance of a home playoff game, and the chance they fall out - from a 10,000-run simulation of the rest of the season, with the bid-thief watch underneath.</p>
+
+<div class="card">
+<div class="lead">Where BYU stands</div>
+<div style="font-size:18px;font-weight:700;margin-top:4px">BYU - CFP #10 <span style="color:var(--mut);font-weight:400;font-size:13px">(Nov 10, 2026 committee rankings)</span> &middot; 7-2 overall, 4-2 in the Big 12</div>
+<div class="fine" style="margin-top:4px">In the 12-team format, seeds 1-4 get a bye, <b>seeds 5-8 host a first-round game on campus</b>, seeds 9-12 go on the road. At #10 BYU is in the field but on the road; the cfb.fyi projected bracket sends them to #7 Miami. Hosting means climbing at least two spots.</div>
+</div>
+
+<h2>The four ways this ends</h2>
+<div class="card">
+<div class="lead">10,000 simulated seasons - every outcome adds to 100%, so nothing is double-counted</div>
+<div class="grid">
+<div class="stat"><div class="v good">19.9%</div><div class="l">Move up (seeds 1-9) - BYU jumps teams ahead</div></div>
+<div class="stat"><div class="v mid">4.1%</div><div class="l">Stay exactly #10</div></div>
+<div class="stat"><div class="v mid">4.8%</div><div class="l">Jumped, but still in (seeds 11-12)</div></div>
+<div class="stat"><div class="v bad">71.2%</div><div class="l">Fall out of the field</div></div>
+</div>
+<div class="stacked">
+<div style="width:19.9%;background:#3ddc84">19.9%</div>
+<div style="width:4.1%;background:#f5b700"></div>
+<div style="width:4.8%;background:#e0885a"></div>
+<div style="width:71.2%;background:#ff6b6b">71.2% fall out</div>
+</div>
+<div class="legend"><span><b style="background:#3ddc84"></b>Move up</span><span><b style="background:#f5b700"></b>Stay #10</span><span><b style="background:#e0885a"></b>Jumped, still in</span><span><b style="background:#ff6b6b"></b>Fall out</span></div>
+</div>
+
+<h2>Home game and bye chances</h2>
+<div class="card">
+<div class="grid">
+<div class="stat"><div class="v">28.8%</div><div class="l">Make the 12-team playoff</div></div>
+<div class="stat"><div class="v good">11.7%</div><div class="l">Home first-round game (seeds 5-8)</div></div>
+<div class="stat"><div class="v">4.0%</div><div class="l">First-round bye (seeds 1-4)</div></div>
+<div class="stat"><div class="v">13.1%</div><div class="l">Road first-round game (seeds 9-12)</div></div>
+</div>
+<div class="fine" style="margin-top:8px">ESPN FPI's Nov 9 snapshot puts BYU's playoff chance at 35.0% - same ballpark, different model. The 28.8% above is the cfb.fyi simulation from Nov 11 and drives everything else on this page.</div>
+</div>
+
+<h2>Full seed distribution</h2>
+<div class="card">
+<div class="lead">Chance BYU lands on each seed - cfb.fyi simulation, Nov 11</div>
+<div class="bars" id="seedbars"></div>
+</div>
+
+<h2>Getting jumped</h2>
+<div class="card">
+<div class="lead">Teams ranked behind BYU, by chance to make the field - each one that gets in is a team that jumped them</div>
+<table><tr><th></th><th>Team</th><th>Conf</th><th>Make playoff</th><th>Home game</th></tr><tbody id="behind"></tbody></table>
+</div>
+
+<h2>Jumping teams</h2>
+<div class="card">
+<div class="lead">Teams ranked ahead of BYU, by chance to make the field - the vulnerable ones are who BYU passes</div>
+<table><tr><th></th><th>Team</th><th>Conf</th><th>Make playoff</th><th>Bye</th></tr><tbody id="ahead"></tbody></table>
+</div>
+
+<h2>Bid thief watch</h2>
+<div class="card">
+<div class="lead">Chance at least one P4 title game is won by a team ranked behind BYU</div>
+<div class="big" style="margin-top:6px">&asymp;70%</div>
+<div class="chips">
+<div class="chip">Big Ten <b>36.5%</b></div>
+<div class="chip">Big 12 <b>35.1%</b></div>
+<div class="chip">ACC <b>26.0%</b></div>
+<div class="chip">SEC <b>2.0%</b></div>
+</div>
+<div class="fine" style="margin-top:8px">Each conference number is the sum of its ESPN FPI title odds for teams ranked behind BYU in the Nov 10 CFP rankings (only one champion per conference, so those add cleanly; BYU's own 8.3% Big 12 title chance is excluded). The combined &asymp;70% is an approximation that treats the four conference races as independent - FPI's simulations share model correlations, so the true number is somewhat different. Title odds are the Nov 9 FPI snapshot; ranks move weekly, so this changes every Tuesday. <b>Don't add this to the simulation numbers above</b> - thief scenarios are already inside the 71.2% fall-out number; this card just isolates that one risk. Full team-by-team thief odds and champion picks: <a href="thieves.html">Bid thieves</a>.</div>
+</div>
+
+<h2>Method and sources</h2>
+<div class="card fine">
+Simulation numbers: <a href="https://cfb.fyi/cfp" target="_blank" rel="noopener">cfb.fyi playoff projection</a> - the rest of the season played out 10,000 times using each game's betting line and team power ratings, snapshot taken Nov 11, 2026. Seed bands: bye = seeds 1-4, home = 5-8, road = 9-12, out = unseeded. Bid-thief math: <a href="https://www.espn.com/college-football/fpi" target="_blank" rel="noopener">ESPN FPI</a> conference-title odds (Nov 9 snapshot) over the <a href="https://collegefootballplayoff.com/rankings" target="_blank" rel="noopener">Nov 10 CFP rankings</a>. These are model outputs, not committee predictions; the committee decides the real rankings every Tuesday.
+</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+// cfb.fyi snapshot, Nov 11, 2026: make-field %, bye %, and 12-seed distribution per team
+const T={
+ "Georgia":{a:"UGA",c:"SEC",cfp:1,mf:.967,bye:.757,home:.163,road:.047},
+ "Miami":{a:"MIA",c:"ACC",cfp:7,mf:.907,bye:.551,home:.266,road:.090},
+ "Alabama":{a:"ALA",c:"SEC",cfp:3,mf:.850,bye:.359,home:.346,road:.145},
+ "Utah":{a:"UTAH",c:"Big 12",cfp:2,mf:.844,bye:.456,home:.264,road:.123},
+ "Indiana":{a:"IU",c:"Big Ten",cfp:9,mf:.830,bye:.430,home:.281,road:.119},
+ "Texas":{a:"TEX",c:"SEC",cfp:6,mf:.736,bye:.261,home:.308,road:.168},
+ "UCLA":{a:"UCLA",c:"Big Ten",cfp:4,mf:.698,bye:.318,home:.244,road:.135},
+ "Notre Dame":{a:"ND",c:"Ind",cfp:5,mf:.689,bye:.106,home:.307,road:.276},
+ "Wake Forest":{a:"WAKE",c:"ACC",cfp:13,mf:.586,bye:.193,home:.234,road:.159},
+ "Texas Tech":{a:"TTU",c:"Big 12",cfp:12,mf:.424,bye:.076,home:.145,road:.202},
+ "Ohio State":{a:"OSU",c:"Big Ten",cfp:20,mf:.374,bye:.062,home:.153,road:.159},
+ "Tennessee":{a:"TENN",c:"SEC",cfp:8,mf:.363,bye:.068,home:.163,road:.132},
+ "Boise State":{a:"BOIS",c:"Pac-12",cfp:24,mf:.357,bye:.009,home:.038,road:.310},
+ "Iowa":{a:"IOWA",c:"Big Ten",cfp:15,mf:.351,bye:.051,home:.149,road:.150},
+ "USC":{a:"USC",c:"Big Ten",cfp:18,mf:.324,bye:.068,home:.135,road:.121},
+ "BYU":{a:"BYU",c:"Big 12",cfp:10,mf:.288,bye:.040,home:.117,road:.131},
+ "Ole Miss":{a:"MISS",c:"SEC",cfp:19,mf:.277,bye:.027,home:.115,road:.135},
+ "Liberty":{a:"LIB",c:"C-USA",cfp:null,mf:.261,bye:.004,home:.021,road:.235},
+ "Kentucky":{a:"UK",c:"SEC",cfp:11,mf:.238,bye:.039,home:.105,road:.094},
+ "Oregon":{a:"ORE",c:"Big Ten",cfp:16,mf:.237,bye:.025,home:.091,road:.121},
+ "New Mexico":{a:"UNM",c:"MW",cfp:null,mf:.227,bye:.005,home:.020,road:.201},
+ "LSU":{a:"LSU",c:"SEC",cfp:21,mf:.172,bye:.018,home:.071,road:.083},
+ "Arizona":{a:"ARIZ",c:"Big 12",cfp:23,mf:.151,bye:.018,home:.055,road:.078},
+ "SMU":{a:"SMU",c:"ACC",cfp:null,mf:.120,bye:.009,home:.036,road:.076},
+ "Houston":{a:"HOU",c:"Big 12",cfp:14,mf:.097,bye:.008,home:.033,road:.057},
+ "South Carolina":{a:"SC",c:"SEC",cfp:17,mf:.057,bye:.007,home:.019,road:.031},
+ "Duke":{a:"DUKE",c:"ACC",cfp:null,mf:.055,bye:.007,home:.020,road:.028},
+ "Wisconsin":{a:"WIS",c:"Big Ten",cfp:null,mf:.050,bye:.004,home:.016,road:.030},
+ "Oklahoma State":{a:"OKST",c:"Big 12",cfp:25,mf:.036,bye:.002,home:.007,road:.027},
+ "Missouri":{a:"MIZ",c:"SEC",cfp:22,mf:.030,bye:.002,home:.010,road:.017},
+ "Baylor":{a:"BAY",c:"Big 12",cfp:null,mf:.028,bye:.001,home:.003,road:.023},
+ "Oklahoma":{a:"OU",c:"SEC",cfp:null,mf:.020,bye:.002,home:.006,road:.012}
+};
+const SEEDS=[.0054,.0085,.0122,.0135,.0214,.0279,.0331,.0348,.0424,.0409,.0367,.0112];
+const OUT=1-SEEDS.reduce((a,b)=>a+b,0);
+function pct(x){return (x*100).toFixed(1)+"%"}
+// seed bars
+let sb="";const all=SEEDS.concat([OUT]);
+all.forEach((p,i)=>{
+ const lbl=i<12?("Seed "+(i+1)):"Out";
+ const col=i<4?"#3ddc84":i<8?"#4cc3ff":i<12?"#f5b700":"#ff6b6b";
+ sb+=`<div class="brow"><span class="bl">${lbl}</span><span class="bt" style="width:${(p*100*8).toFixed(0)}px;background:${col}"></span><span class="bv">${pct(p)}</span></div>`;
+});
+$("seedbars").innerHTML=sb;
+// tables
+const ahead=Object.entries(T).filter(([n,t])=>t.cfp&&t.cfp<10).sort((a,b)=>b[1].mf-a[1].mf);
+const behind=Object.entries(T).filter(([n,t])=>t.cfp&&t.cfp>10).sort((a,b)=>b[1].mf-a[1].mf);
+$("ahead").innerHTML=ahead.map(([n,t])=>`<tr><td><span class="rk">#${t.cfp}</span></td><td>${n}</td><td>${t.c}</td><td>${pct(t.mf)}</td><td>${pct(t.bye)}</td></tr>`).join("");
+$("behind").innerHTML=behind.map(([n,t])=>`<tr><td><span class="rk">#${t.cfp}</span></td><td>${n}</td><td>${t.c}</td><td>${pct(t.mf)}</td><td>${pct(t.home)}</td></tr>`).join("");
+</script>
+</body></html>
