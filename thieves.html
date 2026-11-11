@@ -63,7 +63,7 @@ button.reset:hover{border-color:var(--b)}
 </div>
 
 <h2>Pick each conference champion</h2>
-<p class="fine">The favorite (ESPN FPI conference-title odds) is preselected. Tap any contender to crown them instead and watch the projected field update. Group of 6 picks are informational only: under the 2026 format the Group of 6 auto bid goes to the highest-ranked Group of 6 team whether or not it wins its league, so those picks do not change the projected field. &nbsp;<button class="reset" id="reset">Reset to favorites</button></p>
+<p class="fine">The favorite (ESPN FPI conference-title odds) is preselected. Tap any contender to crown them instead and watch the projected field update. Group of 6 picks are informational only: under the 2026 format the Group of 6 auto bid goes to the highest-ranked Group of 6 team whether or not it wins its league, so those picks do not change the projected field. Seeding follows the committee rankings, with an auto bid ranked outside the top 12 slotted at the back - the official 2026-27 rule, so the Group of 6 bid (Boise St, CFP #24) always seeds #12 on this page. &nbsp;<button class="reset" id="reset">Reset to favorites</button></p>
 <div class="confs" id="confs"></div>
 
 <h2>Projected 12-team field</h2>
@@ -133,15 +133,17 @@ function render(){
  const field=champs.slice();if(ndIn)field.push(nd);
  let need=12-field.length;
  for(const t of atlarge){if(need<=0)break;field.push(t);need--}
- // seeding: by ranking; automatic qualifiers outside the top 12 slot at the bottom
+ // Official 2026-27 seeding (CFP Selection Committee 101): seeds follow the committee ranking,
+ // but an auto bid ranked outside the top 12 slots at the bottom of the bracket, in rank order.
+ // With the Nov 10 rankings the Group of 6 auto bid always sits outside the top 12, so it seeds #12.
  const isAQ=t=>champs.indexOf(t)>=0;
- field.sort((x,y)=>rk(x)-rk(y)||x.fr-y.fr);
+ field.sort((x,y)=>{const ax=isAQ(x)&&rk(x)>12?1:0, ay=isAQ(y)&&rk(y)>12?1:0;return ax-ay||rk(x)-rk(y)||x.fr-y.fr});
  let fh=`<tr><th>Seed</th><th>Team</th><th>How they're in</th><th>Ranking</th><th></th></tr>`;
  field.forEach((t,i)=>{
   const how=t===g5?(champ(t.c)&&champ(t.c).id===t.id?(CN[t.c]+" champion + highest-ranked Group of 6 team (auto)"):"Highest-ranked Group of 6 team (auto)"):isAQ(t)?(CN[t.c]+" champion (auto)"):t.id==="87"?"Notre Dame (top-12 rule)":"At-large";
   const th=isAQ(t)&&behind(t)?`<span class="tag thief">THIEF</span>`:"";
   const byu=t.id===BYU?` <span class="tag byu">BYU</span>`:"";
-  const note=rk(t)>=1000?("outside "+BASISLBL+" top 25 - seeded at the back as an auto-bid"):"";
+  const note=isAQ(t)&&rk(t)>12?("outside "+BASISLBL+" top 12 - seeded at the back as an auto-bid"):"";
   fh+=`<tr${t.id===BYU?' class="hl"':""}><td>${i+1}</td><td><b>${t.n}</b>${byu}</td><td>${how}</td><td>${rankOf(t)}${note?` <span class="fine">${note}</span>`:""}</td><td>${th}</td></tr>`;
  });
  $("field").innerHTML=fh;
