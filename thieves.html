@@ -25,6 +25,14 @@ button.reset{background:var(--card);border:1px solid var(--rule);color:var(--ink
 button.reset:hover{border-color:var(--b)}
 .status{font-size:15px;margin-top:8px}
 @media(max-width:600px){th,td{padding:7px 5px;font-size:12px}.tm{font-size:13px}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
+.stat{background:#131a2b;border:1px solid var(--rule);border-radius:10px;padding:10px 12px}
+.stat .v{font-size:24px;font-weight:800}
+.stat .l{color:var(--mut);font-size:12px;margin-top:2px}
+.good{color:var(--good)}.bad{color:var(--bad)}.mid{color:var(--a)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{background:#131a2b;border:1px solid var(--rule);border-radius:9px;padding:8px 12px;font-size:14px}
+.chip b{color:var(--b)}
 </style></head><body>
 <main>
 <nav aria-label="Site navigation" class="nav"><a href="./">&larr; Big 12 tools</a><a href="odds.html">Playoff odds</a><a href="opponents.html">Opponent win %</a><a href="common.html">Common opponents</a><a href="cfp.html">CFP schedules &amp; odds</a><a href="tv.html">BYU rooting guide</a><a href="resume.html">Resume</a><a href="power.html">Power</a></nav>
@@ -33,6 +41,26 @@ button.reset:hover{border-color:var(--b)}
 <p class="fine">Format: <a href="https://collegefootballplayoff.com/news/2026/8/6/sc-aug-2627" target="_blank" rel="noopener">CFP Selection Committee, 2026-27 format</a> and <a href="https://collegefootballplayoff.com/news/2026/11/2/cfp-sc-101" target="_blank" rel="noopener">how the field is built</a>. Title odds are <a href="https://www.espn.com/college-football/fpi" target="_blank" rel="noopener">ESPN FPI</a> season simulations, not a committee prediction. Rankings are the <b>CFP Top 25 from Nov 10, 2026</b>, from the <a href="https://collegefootballplayoff.com/rankings" target="_blank" rel="noopener">official committee release</a>. This is a projection, not a promise.</p>
 
 <div class="card" id="byu"></div>
+
+
+<h2>Bid thief count: exactly 1, 2, or 3?</h2>
+<div class="card">
+<div class="lead">Chance that exactly this many power-conference title games are won by a team ranked behind BYU (or unranked) - calculated from the FPI title odds on this page. NOTE: these inputs cover ALL futures - they are <b>not</b> conditioned on BYU winning out (see the fine print).</div>
+<div class="grid">
+<div class="stat"><div class="v">29.9%</div><div class="l">0 thieves - every P4 champ stays ranked ahead of BYU</div></div>
+<div class="stat"><div class="v mid">44.5%</div><div class="l">Exactly 1 thief</div></div>
+<div class="stat"><div class="v mid">21.9%</div><div class="l">Exactly 2 thieves</div></div>
+<div class="stat"><div class="v bad">3.7%</div><div class="l">Exactly 3 thieves</div></div>
+<div class="stat"><div class="v bad">&lt;0.1%</div><div class="l">All 4 conferences</div></div>
+</div>
+<div class="chips" style="margin-top:8px">
+<div class="chip">Big Ten thief odds <b>36.5%</b></div>
+<div class="chip">Big 12 thief odds <b>35.1%</b></div>
+<div class="chip">ACC thief odds <b>26.0%</b></div>
+<div class="chip">SEC thief odds <b>2.0%</b></div>
+</div>
+<div class="fine" style="margin-top:8px"><b>Two honest limits.</b> (1) A "thief" is a team ranked behind BYU that wins its conference and takes an automatic-bid spot - that is NOT the same as a team passing BYU in the committee rankings. True "jumped by 1/2/3 teams" odds need per-simulation committee ranks, which no source we found publishes; the Monte Carlo on the <a href="odds.html">Playoff odds</a> page estimates them under explicit, adjustable ranking stand-ins. (2) The four inputs are ESPN FPI conference-title odds from the Nov 9 snapshot. These published inputs cover all futures, not just BYU winning out; this calculation does not condition them on BYU's results. <b>How the count works:</b> each conference's number sums its behind-BYU teams' title odds (one champion per conference, so those add cleanly); the count then treats the four conference races as independent - an approximation. Consistency check: 100% - 29.9% = 70.1% chance of at least one thief. Sources: <a href="https://www.espn.com/college-football/fpi" target="_blank" rel="noopener">ESPN FPI</a> title odds (Nov 9) over the <a href="https://collegefootballplayoff.com/rankings" target="_blank" rel="noopener">Nov 10 CFP rankings</a>.</div>
+</div>
 
 <h2>Pick each conference champion</h2>
 <p class="fine">The favorite (ESPN FPI conference-title odds) is preselected. Tap any contender to crown them instead and watch the projected field update. &nbsp;<button class="reset" id="reset">Reset to favorites</button></p>
