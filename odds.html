@@ -126,6 +126,7 @@ button.reset:hover{border-color:var(--b)}
 </div>
 <div class="fine" style="margin-top:6px" id="mcRuleNote"></div>
 <div id="mcOut"></div>
+<div id="mcStep"></div>
 <div class="fine" style="margin-top:10px"><b>What the simulation does.</b> BYU's three remaining games are forced wins (that is the scenario). Every other remaining game involving a CFP top-25 team is drawn from ESPN's matchup-predictor probability for that game (fetched Nov 11), including all 24 remaining Big 12 conference games. The Big 12's two championship-game spots come out of actual conference records plus the official tiebreaker order (head-to-head, record vs tied teams, common opponents, record vs the next-placed teams, opponent win rate, overall record); the steps the policy leaves to SportSource analytics or a coin toss are not computable, so those ties resolve randomly and count. The title game itself is a neutral-site draw on ESPN FPI ratings (same logistic curve as the Big 12 simulator). Other conferences: champions are NOT played out from standings - games between two non-contenders are not tracked, so full SEC, Big Ten and ACC tables are never computed and no drawn champion is verified eligible for its conference title game. Instead the champion is a heuristic draw: ESPN's FPI conference-title odds, re-weighted by that world's simulated results, with each simulated loss cutting a contender's title weight by the factor set in the control above (default 10x). Every contender's own remaining games are tracked (3 per team), so the draw reacts to each contender's actual simulated results - but a contender that loses twice can still be drawn, because two losses do not make a conference title impossible, just unlikely; the factor is your adjustable judgment call, not a sportsbook or committee claim. For scale: with no re-weighting, 27% of worlds crown an SEC, Big Ten or ACC champion that lost 2 or more of its remaining games in that same world; at 10x that is about 1%. The title-game loser is drawn from the same re-weighted odds - an approximation, since FPI publishes title-win odds, not runner-up odds. The Group of 6 automatic bid goes to the highest-ranked Group of 6 team in each world's ranking, champion or not (2026-27 format); Group of 6 conference champions are drawn the same re-weighted way and unranked Group of 6 teams slot in by FPI rating - labeled approximations. Remaining games of unranked teams with live title odds use the FPI rating logistic. Games are drawn independently; the model knows nothing about injuries, weather or momentum.</div>
 <div class="fine" style="margin-top:6px"><b>What it cannot know.</b> How the actual committee will rank teams. The final ranking is approximated by the rule you pick above - a transparent stand-in, not a prediction of committee behavior. Switch rules and watch the buckets move; that spread is the honest uncertainty. Playoff format follows the published 2026-27 rules: ACC, Big Ten, Big 12 and SEC champions are automatic bids; the highest-ranked Group of 6 team gets a bid whether or not it wins its conference; Notre Dame gets a bid if it finishes in the top 12; the field is then seeded straight by committee ranking, top four seeds get byes, 5-8 host first-round games, 9-12 travel.</div>
 <div class="fine" style="margin-top:6px">Sources: CFP committee rankings (Nov 10); ESPN matchup-predictor probabilities and FPI ratings/title odds (fetched Nov 11); Big 12 standings and schedule from ESPN (Nov 11); format per <a href="https://www.ncaa.com/news/football/article/2026-08-11/how-college-football-playoff-works-schedule-selections-rankings-byes-and-more" target="_blank" rel="noopener">NCAA.com</a>. The simulation uses a fixed random seed, so re-running with the same settings reproduces the same numbers. ESPN's branch numbers above come from a different model; nothing here is calibrated to them, or vice versa.</div>
@@ -141,8 +142,8 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
 // Monte Carlo engine: BYU wins out, played forward. Deterministic seed.
 "use strict";
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-function runMC(DATA,opts){
-  const rule=opts.rule||"losses-cfp", N=opts.n||10000, seed=opts.seed==null?20261111:opts.seed;
+function makeSim(DATA,opts){
+  const rule=opts.rule||"losses-cfp", seed=opts.seed==null?20261111:opts.seed;
   const rnd=mulberry32(seed);
   const {GAMES,FORCED,B12T,B12REC,B12DONE,B12REM,TOP,NREC,CGAMES,FPI,WC}=DATA;
   const BYU=252;
@@ -158,6 +159,7 @@ function runMC(DATA,opts){
   for(const id in CGAMES)for(const g of CGAMES[id]){ti(id);ti(g[0])}
   for(const id in FPI)ti(id);
   const NT=TIDS.length;
+  const ID=i=>TIDS[i];
   // game arrays: gA[k],gB[k],gP[k] (prob A wins), forced winners pre-marked
   const gA=[],gB=[],gP=[],gF=[];
   for(const [eid,a,b,p] of GAMES){gA.push(ti(a));gB.push(ti(b));gP.push(p);gF.push(FORCEDSET.has(eid)?1:0)}
@@ -187,7 +189,8 @@ function runMC(DATA,opts){
   // Big 12 tiebreakers (port of site's official-order engine; non-computable steps random)
   function wpVs(g,t,opps){let w=0,n=0;for(const x of g[t])if(opps.indexOf(x[0])>=0){w+=x[1];n++}return n?w/n:null}
   function narrow(cand,vals){let best=-2,out=[],any=false;for(const t of cand){const v=vals.get(t);if(v==null)continue;any=true;if(v>best+1e-9){best=v;out=[t]}else if(Math.abs(v-best)<=1e-9)out.push(t)}return any?out:cand}
-  function seedOne(pool,g,fin){
+  function seedOne(pool,g,fin,r){
+    const R=r||rnd;
     let cand=pool.slice();
     if(cand.length===2){
       const a=cand[0],b=cand[1],pa=wpVs(g,a,[b]),pb=wpVs(g,b,[a]);
@@ -216,9 +219,9 @@ function runMC(DATA,opts){
       }else{const v=new Map();for(const t of cand)v.set(t,fin[t][2]);cand=narrow(cand,v)}
     }
     if(cand.length===1)return cand[0];
-    return cand[rnd()*cand.length|0];
+    return cand[R()*cand.length|0];
   }
-  function tieOrder(pool,g,fin){const out=[],p=pool.slice();while(p.length>1){const w=seedOne(p,g,fin);out.push(w);p.splice(p.indexOf(w),1)}if(p.length)out.push(p[0]);return out}
+  function tieOrder(pool,g,fin,r){const out=[],p=pool.slice();while(p.length>1){const w=seedOne(p,g,fin,r);out.push(w);p.splice(p.indexOf(w),1)}if(p.length)out.push(p[0]);return out}
   function topSeeds(fin,g){
     const pct=t=>fin[t][0]/(fin[t][0]+fin[t][1]);
     const order=b12i.slice().sort((x,y)=>pct(y)-pct(x));const groups=[];
@@ -244,11 +247,9 @@ function runMC(DATA,opts){
     for(const e of pool){if(e[0]===exclude)continue;r2-=e[1];if(r2<=0)return e[0]}
     for(let i=pool.length-1;i>=0;i--)if(pool[i][0]!==exclude)return pool[i][0];
     return -1}
-  // outputs
-  const out={n:N,rule,seed,bye:0,home:0,sneak:0,outN:0,ccgMade:0,ccgWon:0,jumps:{},thiefs:{},brWin:[0,0],brLose:[0,0],brMiss:[0,0],rankSum:0};
   const winK=new Int32Array(NG);
   const byuI=idx.get(BYU), ndI=idx.get(87);
-  for(let it=0;it<N;it++){
+  function simOne(it,capture){
     for(let k=0;k<NG;k++)winK[k]=gF[k]?gA[k]:(rnd()<gP[k]?gA[k]:gB[k]);
     // Big 12 standings
     const fin={};for(let j=0;j<b12i.length;j++)fin[b12i[j]]=[b12base[j][0],b12base[j][1],b12base[j][2],b12base[j][3]];
@@ -264,7 +265,7 @@ function runMC(DATA,opts){
     const s1=seeds12[0],s2=seeds12[1];
     const ccgWinner=rnd()<logistic(s1,s2,true)?s1:s2;
     const ccgLoser=ccgWinner===s1?s2:s1;
-    if(byuI===s1||byuI===s2){out.ccgMade++;if(ccgWinner===byuI)out.ccgWon++}
+    const ccgM=(byuI===s1||byuI===s2)?1:0, ccgW=(ccgWinner===byuI)?1:0;
     // simulate candidate extra games first so champ draws can condition on sampled results
     const csim=new Map();
     for(const [meI,oppI,home,eid] of cgl){
@@ -279,7 +280,7 @@ function runMC(DATA,opts){
     for(const c of ["SEC","B1G","ACC"]){const ch=drawChamp(c,-1,sl);champs[c]=ch;runners[c]=drawChamp(c,ch,sl)}
     const g6champs={};for(const c of G6){const ch=drawChamp(c,-1,sl);if(ch>=0)g6champs[c]=ch}
     // diagnostic: drawn SEC/B1G/ACC champ with 2+ sampled remaining losses (infeasible-looking champion)
-    for(const c of ["SEC","B1G","ACC"]){const ch=champs[c];if(ch>=0&&sl[ch]>=2){out.champInf=(out.champInf||0)+1;break}}
+    let ci=0;for(const c of ["SEC","B1G","ACC"]){const ch=champs[c];if(ch>=0&&sl[ch]>=2){ci=1;break}}
     // final records pool (indices)
     const poolSet=new Set();
     const pw=new Map(),pl=new Map();
@@ -328,22 +329,63 @@ function runMC(DATA,opts){
     }
     const seeded=field.slice().sort((a,b)=>rpos.get(a)-rpos.get(b));
     const spos=new Map();seeded.forEach((t,i)=>spos.set(t,i+1));
-    if(spos.has(byuI)){
-      const s=spos.get(byuI);
-      if(s<=4)out.bye++;else if(s<=8)out.home++;else out.sneak++;
-      if(ccgWinner===byuI)out.brWin[0]++;else if(byuI===s1||byuI===s2)out.brLose[0]++;else out.brMiss[0]++;
-    }else out.outN++;
-    if(ccgWinner===byuI)out.brWin[1]++;else if(byuI===s1||byuI===s2)out.brLose[1]++;else out.brMiss[1]++;
-    const _wl=pl.get(byuI);out.byuL=out.byuL||{};out.byuL[_wl]=(out.byuL[_wl]||0)+1;
-    out.rankSum+=rpos.get(byuI);const _rk=rpos.get(byuI);out.rankHist=out.rankHist||{};const _b=_rk<=4?4:_rk<=8?8:_rk<=12?12:99;out.rankHist[_b]=(out.rankHist[_b]||0)+1;
-    // jumps
+    const byuSeed=spos.has(byuI)?spos.get(byuI):0;
+    const branch=ccgWinner===byuI?0:(byuI===s1||byuI===s2?1:2);
+    const byuRank=rpos.get(byuI);
+    // jumps: teams currently ranked behind BYU (11-25 or unranked) that finish ahead of it
     let jc=0;const br=rpos.get(byuI);
     for(const t of poolArr)if(t!==byuI&&curRank[t]>10&&rpos.get(t)<br)jc++;
-    out.jumps[jc]=(out.jumps[jc]||0)+1;
     // thieves: P4 champs currently ranked >10 or unranked
     let th=0;
     for(const c of P4){const ch=champs[c];if(ch>=0&&curRank[ch]>10)th++}
-    out.thiefs[th]=(out.thiefs[th]||0)+1;
+    const d={it:it,ccgMade:ccgM,ccgWon:ccgW,branch:branch,byuSeed:byuSeed,byuRank:byuRank,byuLosses:pl.get(byuI),jumps:jc,thiefs:th,champInf:ci};
+    if(capture){
+      // display-only extras. The full-standings order below uses a SEPARATE per-world random
+      // stream (drnd) so capturing never perturbs the simulation stream: world #k here is
+      // identical to world #k in the aggregate run for the same seed and settings.
+      const drnd=mulberry32(((seed^0x9E3779B9)+it*2654435761)>>>0);
+      const pctF=t=>fin[t][0]/(fin[t][0]+fin[t][1]);
+      const ord=b12i.slice().sort((x,y)=>pctF(y)-pctF(x));const grps=[];
+      for(const t of ord){const gp=grps.find(gr=>Math.abs(pctF(gr[0])-pctF(t))<1e-9);if(gp)gp.push(t);else grps.push([t])}
+      const b12order=[];for(const gp of grps){const oo=tieOrder(gp,g,fin,drnd);for(const t of oo)b12order.push(t)}
+      const vw={b12:[],s1:ID(s1),s2:ID(s2),ccgW:ID(ccgWinner),ccgL:ID(ccgLoser),ccgP:logistic(s1,s2,true),champs:{},runners:{},g6:{},g6aq:g6best>=0?ID(g6best):0,champLosses:{},rec:{},rank:[],field:[],auto:[],pass:[],thief:[],games:[],xgames:[]};
+      for(const t of b12order){const f=fin[t];vw.b12.push({id:ID(t),cw:f[0],cl:f[1],ow:f[2],ol:f[3]})}
+      for(const c in champs){vw.champs[c]=ID(champs[c]);vw.champLosses[ID(champs[c])]=sl[champs[c]]}
+      for(const c in runners)if(runners[c]>=0)vw.runners[c]=ID(runners[c]);
+      for(const c in g6champs)vw.g6[c]=ID(g6champs[c]);
+      for(const t of poolSet)vw.rec[ID(t)]=[pw.get(t),pl.get(t)];
+      for(const t of rankOrder)vw.rank.push(ID(t));
+      for(const t of seeded)vw.field.push(ID(t));
+      for(const t of auto)if(t>=0)vw.auto.push(ID(t));
+      for(const t of poolArr)if(t!==byuI&&curRank[t]>10&&rpos.get(t)<br)vw.pass.push(ID(t));
+      for(const c of P4){const ch=champs[c];if(ch>=0&&curRank[ch]>10)vw.thief.push(ID(ch))}
+      for(let k=0;k<NG;k++)vw.games.push([ID(gA[k]),ID(gB[k]),ID(winK[k]),gP[k],gF[k]]);
+      for(const [meI,oppI,home,eid] of cgl)vw.xgames.push([ID(meI),ID(oppI),ID(csim.get(eid)),logistic(meI,oppI,!home),home]);
+      d.view=vw;
+    }
+    return d;
+  }
+  return {simOne:simOne,rule:rule,seed:seed};
+}
+function runMC(DATA,opts){
+  const N=opts.n||10000;
+  const S=makeSim(DATA,opts);
+  const out={n:N,rule:S.rule,seed:S.seed,bye:0,home:0,sneak:0,outN:0,ccgMade:0,ccgWon:0,jumps:{},thiefs:{},brWin:[0,0],brLose:[0,0],brMiss:[0,0],rankSum:0};
+  for(let it=0;it<N;it++){
+    const d=S.simOne(it,false);
+    if(d.byuSeed){
+      const s=d.byuSeed;
+      if(s<=4)out.bye++;else if(s<=8)out.home++;else out.sneak++;
+      if(d.branch===0)out.brWin[0]++;else if(d.branch===1)out.brLose[0]++;else out.brMiss[0]++;
+    }else out.outN++;
+    if(d.branch===0)out.brWin[1]++;else if(d.branch===1)out.brLose[1]++;else out.brMiss[1]++;
+    out.ccgMade+=d.ccgMade;if(d.ccgWon)out.ccgWon++;
+    out.jumps[d.jumps]=(out.jumps[d.jumps]||0)+1;
+    out.thiefs[d.thiefs]=(out.thiefs[d.thiefs]||0)+1;
+    if(d.champInf)out.champInf=(out.champInf||0)+1;
+    out.rankSum+=d.byuRank;
+    out.byuL=out.byuL||{};out.byuL[d.byuLosses]=(out.byuL[d.byuLosses]||0)+1;
+    out.rankHist=out.rankHist||{};const _b=d.byuRank<=4?4:d.byuRank<=8?8:d.byuRank<=12?12:99;out.rankHist[_b]=(out.rankHist[_b]||0)+1;
   }
   return out;
 }
@@ -382,12 +424,130 @@ function runMC(DATA,opts){
    const t0=performance.now();
    const o=runMC(MCDATA,{rule:rule,n:n,decay:+$("mcDecay").value});
    const ms=Math.round(performance.now()-t0);
-   render(o);
+   render(o);resetStep();
    $("mcStatus").textContent=n.toLocaleString()+" simulations in "+(ms/1000).toFixed(1)+"s";
    $("mcRun").disabled=false;
   },30);
  }
  $("mcOut").innerHTML="\n<h3 style=\"margin:14px 0 6px\">BYU's playoff result in these worlds</h3>\n<div class=\"grid\">\n<div class=\"stat\"><div class=\"v good\" id=\"mcMake\">-</div><div class=\"l\">Make the playoff</div></div>\n<div class=\"stat\"><div class=\"v\" id=\"mcBye\">-</div><div class=\"l\">Bye (seeds 1-4)</div></div>\n<div class=\"stat\"><div class=\"v mid\" id=\"mcHome\">-</div><div class=\"l\">Home game (seeds 5-8)</div></div>\n<div class=\"stat\"><div class=\"v\" id=\"mcSneak\">-</div><div class=\"l\">Sneak in (seeds 9-12)</div></div>\n<div class=\"stat\"><div class=\"v bad\" id=\"mcOutN\">-</div><div class=\"l\">Out</div></div>\n</div>\n<div class=\"chips\" style=\"margin-top:8px\">\n<div class=\"chip\">Reaches Big 12 title game <b id=\"mcCcgM\">-</b></div>\n<div class=\"chip\">Wins it (automatic bid) <b id=\"mcCcgW\">-</b></div>\n</div>\n<h3 style=\"margin:16px 0 6px\">Split by the Big 12 title game <span style=\"color:var(--mut);font-weight:400;font-size:13px\">- same three branches as ESPN's above; this simulation's own split, not ESPN's</span></h3>\n<div class=\"grid\">\n<div class=\"stat\"><div class=\"v good\" id=\"mcBrW\">-</div><div class=\"l\">Wins title game: makes playoff</div></div>\n<div class=\"stat\"><div class=\"v mid\" id=\"mcBrL\">-</div><div class=\"l\">Loses title game (10-3): makes playoff</div></div>\n<div class=\"stat\"><div class=\"v good\" id=\"mcBrM\">-</div><div class=\"l\">Misses title game (10-2): makes playoff</div></div>\n</div>\n<h3 style=\"margin:16px 0 6px\">How many teams pass BYU <span style=\"color:var(--mut);font-weight:400;font-size:13px\">- teams currently ranked 11-25 or unranked that finish ahead of BYU in the simulated ranking</span></h3>\n<div class=\"grid\" id=\"mcJumps\"></div>\n<h3 style=\"margin:16px 0 6px\">Bid thieves in these worlds <span style=\"color:var(--mut);font-weight:400;font-size:13px\">- P4 champions currently ranked behind BYU (or unranked), conditioned on BYU winning out</span></h3>\n<div class=\"grid\" id=\"mcThiefs\"></div>\n<div class=\"fine\" style=\"margin-top:6px\">Compare the unconditional estimate in the section below (0/1/2/3/4 thieves: 29.9 / 44.5 / 21.9 / 3.7 / &lt;0.1). Conditioning on BYU winning out shifts it: BYU takes the Big 12 crown in the worlds above, removing one thief slot part of the time.</div>\n";
+ // ---- Step through the simulations, one world at a time ----
+ const CONFM={};for(const id in MCDATA.TOP)CONFM[id]=MCDATA.TOP[id][3];
+ for(const t of MCDATA.B12T)CONFM[t]="B12";
+ for(const c in MCDATA.WC)for(const id in MCDATA.WC[c])if(!CONFM[id])CONFM[id]=c;
+ const nm=id=>MCDATA.NAMES[id]||("Team "+id);
+ const cfn=id=>CONFM[id]||"";
+ let STEP=null;
+ function stepRun(k){
+  while(STEP.cache.length<k)STEP.cache.push(STEP.S.simOne(STEP.cache.length,true));
+  STEP.k=k;renderStep();
+ }
+ function stepTo(k){
+  if(!STEP)return;
+  k=Math.max(1,Math.min(STEP.N,Math.floor(k)||1));
+  if(k>STEP.cache.length+300){
+   const st=$("mcWStatus");if(st)st.textContent="Stepping forward to world "+k.toLocaleString()+"...";
+   setTimeout(()=>{stepRun(k);const st2=$("mcWStatus");if(st2)st2.textContent=""},20);
+  }else stepRun(k);
+ }
+ function resetStep(){
+  STEP={S:makeSim(MCDATA,{rule:$("mcRule").value,decay:+$("mcDecay").value}),cache:[],N:+$("mcN").value,k:0};
+  stepRun(1);
+ }
+ function renderStep(){
+  const d=STEP.cache[STEP.k-1], k=STEP.k, N=STEP.N, v=d.view;
+  const rec=id=>{const r=v.rec[id];return r?r[0]+"-"+r[1]:"-"};
+  const curLbl=id=>{const t=MCDATA.TOP[id];return t?("#"+t[0]+" CFP"):"unranked"};
+  const rankPos={};v.rank.forEach((id,i)=>rankPos[id]=i+1);
+  const champTag=id=>{for(const c in v.champs)if(v.champs[c]===id)return c+" champ";for(const c in v.g6)if(v.g6[c]===id)return c+" champ";return ""};
+  let banner,cls;
+  if(d.byuSeed){const s=d.byuSeed;
+   if(s<=4){banner="BYU gets a BYE - #"+s+" seed";cls="good"}
+   else if(s<=8){banner="BYU HOSTS a first-round game - #"+s+" seed";cls="good"}
+   else{banner="BYU sneaks in - #"+s+" seed, on the road";cls="mid"}}
+  else{banner="BYU is OUT - finishes #"+d.byuRank+" in this world\u2019s ranking";cls="bad"}
+  const bseed=v.s1===252?1:(v.s2===252?2:0);
+  let path;
+  if(d.branch===0)path="Reaches the Big 12 title game as the #"+bseed+" seed and <b>beats "+nm(v.ccgL)+"</b> - finishes 11-2, Big 12 champion, automatic bid.";
+  else if(d.branch===1)path="Reaches the Big 12 title game as the #"+bseed+" seed and <b>loses to "+nm(v.ccgW)+"</b> - finishes 10-3, at-large case.";
+  else{const pos=v.b12.findIndex(r=>r.id===252)+1;path="Finishes #"+pos+" in the Big 12 standings and <b>misses the title game</b> ("+nm(v.s1)+" and "+nm(v.s2)+" go instead) - 10-2, at-large case."}
+  const passSorted=v.pass.slice().sort((a,b)=>(rankPos[a]||99)-(rankPos[b]||99));
+  const passNames=passSorted.length?passSorted.map(id=>nm(id)+" (#"+(rankPos[id]||"-")+")").join(", "):"nobody passes";
+  const thiefNames=v.thief.length?v.thief.map(id=>nm(id)+" ("+cfn(id)+")").join(", "):"none";
+  let h='<h3 style="margin:16px 0 6px">Step through the simulations, one world at a time</h3>'
+  +'<div class="fine" style="margin-bottom:8px">This is world #'+k.toLocaleString()+' of the '+N.toLocaleString()+' counted in the aggregate above - same fixed seed and settings, nothing re-drawn for display, so step #1 here is the first world the aggregate counted. Changing a control above re-runs everything and restarts this counter at world #1.</div>'
+  +'<div class="chips" style="align-items:center">'
+  +'<div class="chip"><button class="reset" id="mcWPrev"'+(k<=1?' disabled':'')+'>&larr; Prev world</button> <button class="reset" id="mcWNext"'+(k>=N?' disabled':'')+'>Next world &rarr;</button></div>'
+  +'<div class="chip">World <input id="mcWNum" type="number" min="1" max="'+N+'" value="'+k+'" style="width:90px;background:var(--card);color:var(--ink);border:1px solid var(--rule);border-radius:6px;padding:2px 6px"> of '+N.toLocaleString()+' <button class="reset" id="mcWGo">Go</button></div>'
+  +'<div class="chip" id="mcWStatus" style="color:var(--mut)"></div>'
+  +'</div>'
+  +'<div class="stat" style="margin-top:10px"><div class="v '+cls+'">'+banner+'</div><div class="l">'+path+'</div></div>'
+  +'<div class="grid">'
+  +'<div class="stat"><div class="v">'+v.pass.length+'</div><div class="l">Teams passing BYU in this world: '+passNames+'</div></div>'
+  +'<div class="stat"><div class="v">'+v.thief.length+'</div><div class="l">Bid thieves in this world: '+thiefNames+'</div></div>'
+  +'<div class="stat"><div class="v">'+rec(252)+'</div><div class="l">BYU final record, #'+d.byuRank+' in this world\u2019s ranking stand-in</div></div>'
+  +'</div>';
+  // playoff field table
+  h+='<h3 style="margin:16px 0 6px">The 12-team field in this world</h3><table><tr><th>Seed</th><th>Team</th><th>Conf</th><th>Record</th><th>World rank</th><th>How they got in</th></tr><tbody>';
+  v.field.forEach((id,i)=>{
+   const s=i+1, band=s<=4?"bye":s<=8?"hosts":"road";
+   let how;
+   if(id===v.champs.B12)how="Big 12 champion - played out";
+   else if(id===v.g6aq){let lg="";for(const c in v.g6)if(v.g6[c]===id)lg=c;how="Highest-ranked Group of 6 team"+(lg?" (won the "+lg+")":" - not a conference champion")}
+   else{let cc="";for(const c of ["SEC","B1G","ACC"])if(v.champs[c]===id)cc=c;
+    if(cc)how=cc+" champion - heuristic draw";
+    else how=id===87?"At-large - Notre Dame top-12 rule":"At-large"}
+   h+='<tr'+(id===252?' class="byu"':'')+'><td><span class="rk">'+s+'</span><span style="color:var(--mut);font-size:12px">'+band+'</span></td><td><b>'+nm(id)+'</b></td><td>'+cfn(id)+'</td><td>'+rec(id)+'</td><td>'+(rankPos[id]?"#"+rankPos[id]:"-")+'</td><td>'+how+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  // ranking table
+  h+='<h3 style="margin:16px 0 6px">This world\u2019s final ranking <span style="color:var(--mut);font-weight:400;font-size:13px">- the stand-in rule selected above, not a committee prediction</span></h3><table><tr><th></th><th>Team</th><th>Record</th><th>Now</th><th></th></tr><tbody>';
+  const byuIdx=v.rank.indexOf(252);
+  const rowr=id=>'<tr'+(id===252?' class="byu"':'')+'><td>'+rankPos[id]+'</td><td><b>'+nm(id)+'</b>'+(v.pass.indexOf(id)>=0?' <span class="mid">&uarr; passes BYU</span>':'')+'</td><td>'+rec(id)+'</td><td>'+curLbl(id)+'</td><td style="color:var(--mut);font-size:12px">'+champTag(id)+'</td></tr>';
+  v.rank.slice(0,15).forEach(id=>{h+=rowr(id)});
+  if(byuIdx>=15)h+='<tr><td colspan="5" style="color:var(--mut)">&hellip;</td></tr>'+rowr(252);
+  h+='</tbody></table>';
+  // Big 12 race (collapsed)
+  h+='<details style="margin-top:14px"><summary style="cursor:pointer;font-weight:700">The Big 12 race in this world</summary>'
+  +'<div class="fine" style="margin:6px 0">Title game: <b>'+nm(v.ccgW)+'</b> def. '+nm(v.ccgL)+' (drawn at '+Math.round(100*(v.ccgW===v.s1?v.ccgP:1-v.ccgP))+'% on the neutral-site FPI logistic). Standings use the official tiebreaker order; ties the policy leaves to SportSource or a coin toss resolve randomly.</div>'
+  +'<table><tr><th></th><th>Team</th><th>Conf</th><th>Overall</th><th></th></tr><tbody>';
+  v.b12.forEach((r,i)=>{
+   const note=(r.id===v.s1||r.id===v.s2)?("title game - "+(r.id===v.ccgW?"won":"lost")):"";
+   h+='<tr'+(r.id===252?' class="byu"':'')+'><td>'+(i+1)+'</td><td><b>'+nm(r.id)+'</b></td><td>'+r.cw+"-"+r.cl+'</td><td>'+r.ow+"-"+r.ol+'</td><td style="color:var(--mut);font-size:12px">'+note+'</td></tr>';
+  });
+  h+='</tbody></table></details>';
+  // champions drawn (collapsed)
+  h+='<details style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">Champions in this world</summary><table style="margin-top:6px"><tr><th>Conf</th><th>Champion</th><th>How</th></tr><tbody>'
+  +'<tr><td>B12</td><td><b>'+nm(v.champs.B12)+'</b> over '+nm(v.runners.B12)+'</td><td>played out from standings + tiebreakers</td></tr>';
+  for(const c of ["SEC","B1G","ACC"]){
+   const ch=v.champs[c];if(!ch)continue;
+   const L=v.champLosses[ch]||0;
+   const flag=L>=2?' <span class="bad">&#9888; drawn despite '+L+' losses in its tracked games in this world</span>':(L===1?' <span style="color:var(--mut)">(1 tracked loss in this world)</span>':"");
+   h+='<tr><td>'+c+'</td><td><b>'+nm(ch)+'</b>'+(v.runners[c]?' <span style="color:var(--mut)">over '+nm(v.runners[c])+'</span>':"")+flag+'</td><td>heuristic draw</td></tr>';
+  }
+  let aqNote="not a conference champion";for(const c in v.g6)if(v.g6[c]===v.g6aq)aqNote="won the "+c;
+  for(const c in v.g6)h+='<tr><td>'+c+'</td><td><b>'+nm(v.g6[c])+'</b></td><td>heuristic draw</td></tr>';
+  h+='<tr><td>G6 bid</td><td><b>'+nm(v.g6aq)+'</b> <span style="color:var(--mut)">('+aqNote+')</span></td><td>highest-ranked Group of 6 team in this world</td></tr>';
+  h+='</tbody></table><div class="fine" style="margin-top:6px">Non-Big-12 champions are the heuristic draws described in the fine print above - weighted by ESPN title odds, cut by the consistency factor for each loss the team took in this world. They are not verified eligible for their title games.</div></details>';
+  // every tracked game (collapsed)
+  h+='<details style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">Every tracked game in this world ('+v.games.length+')</summary><table style="margin-top:6px"><tr><th>Result</th><th>Winner\u2019s odds</th><th></th></tr><tbody>';
+  v.games.forEach(gm=>{
+   const wp=gm[2]===gm[0]?gm[3]:1-gm[3];
+   const loser=gm[2]===gm[0]?gm[1]:gm[0];
+   const tags=(gm[4]?'<span style="color:var(--b)">forced - the scenario</span>':"")+((!gm[4]&&wp<0.4)?' <span class="mid">upset</span>':"");
+   h+='<tr><td><b>'+nm(gm[2])+'</b> def. '+nm(loser)+'</td><td>'+Math.round(100*wp)+'%</td><td style="font-size:12px">'+tags+'</td></tr>';
+  });
+  v.xgames.forEach(gm=>{
+   const wp=gm[2]===gm[0]?gm[3]:1-gm[3];
+   const loser=gm[2]===gm[0]?gm[1]:gm[0];
+   h+='<tr><td><b>'+nm(gm[2])+'</b> def. '+nm(loser)+'</td><td>'+Math.round(100*wp)+'%</td><td style="color:var(--mut);font-size:12px">contender game (FPI logistic)</td></tr>';
+  });
+  h+='</tbody></table></details>';
+  $("mcStep").innerHTML=h;
+  $("mcWPrev").onclick=()=>stepTo(k-1);
+  $("mcWNext").onclick=()=>stepTo(k+1);
+  $("mcWGo").onclick=()=>stepTo(+$("mcWNum").value);
+  $("mcWNum").onkeydown=e=>{if(e.key==="Enter")stepTo(+e.target.value)};
+ }
  $("mcRun").onclick=run;
  $("mcRule").onchange=run; $("mcN").onchange=run; $("mcDecay").onchange=run;
  run();
