@@ -51,7 +51,7 @@ button.reset:hover{border-color:var(--b)}
 <main>
 <nav aria-label="Site navigation" class="nav"><a href="./">&larr; Big 12 tools</a><a class="here" href="odds.html">Playoff odds</a><a href="thieves.html">Bid thieves</a><a href="opponents.html">Opponent win %</a><a href="common.html">Common opponents</a><a href="cfp.html">CFP schedules &amp; odds</a><a href="tv.html">BYU rooting guide</a><a href="resume.html">Resume</a><a href="power.html">Power</a></nav>
 <h1>BYU playoff odds</h1>
-<p class="intro">The centerpiece: where BYU stands, where their playoff seed lands across 10,000 simulated seasons, the chance of a home game, the chance they fall out, and the chase around them - with the bid-thief watch underneath.</p>
+<p class="intro">This page answers one question: <b>if BYU wins its final three regular-season games, what happens?</b> First the chance that happens at all, then the playoff picture in that scenario, from ESPN's Allstate Playoff Predictor simulations. Numbers that cover all futures (not just win-out ones) are kept in the collapsed appendix at the bottom.</p>
 
 <h2>Odds BYU goes undefeated the rest of the regular season</h2>
 <div class="card">
@@ -63,7 +63,6 @@ button.reset:hover{border-color:var(--b)}
 <div class="chip">Nov 28 - Cincinnati (home) <b>84.5%</b></div>
 </div>
 <div class="fine" style="margin-top:8px">BYU is 7-2, so this is running the table from here, not an undefeated season. Big 12 championship game not included - this covers the three regular-season games only. The 42.0% multiplies ESPN's per-game probabilities (same math as the win-out column on <a href="cfp.html">CFP schedules &amp; odds</a>); per-game odds assume each game is independent, so treat it as an approximation. Source: <a href="https://www.espn.com/college-football/team/schedule/_/id/252" target="_blank" rel="noopener">ESPN</a> game probabilities, refreshed Nov 11, 2026.</div>
-<div class="fine" style="margin-top:6px;color:var(--a)">Note: everything below this section is currently UNCONDITIONAL - it covers all futures, not just win-out ones. A rebuild of this page that assumes BYU wins out (conditioned odds) is in progress.</div>
 </div>
 
 <div class="card">
@@ -71,6 +70,40 @@ button.reset:hover{border-color:var(--b)}
 <div style="font-size:18px;font-weight:700;margin-top:4px">BYU - CFP #10 <span style="color:var(--mut);font-weight:400;font-size:13px">(Nov 10, 2026 committee rankings)</span> &middot; 7-2 overall, 4-2 in the Big 12</div>
 <div class="fine" style="margin-top:4px">In the 12-team format, seeds 1-4 get a bye, <b>seeds 5-8 host a first-round game on campus</b>, seeds 9-12 go on the road. At #10 BYU is in the field but on the road; the cfb.fyi projected bracket sends them to #7 Miami. Hosting means finishing seeded 5-8. Seeds follow the committee ranking, except automatic bids can pull a champion up: their projection seeds Pac-12 champ Boise State #12 despite a #24 ranking.</div>
 </div>
+
+<h2>If BYU wins out: the playoff picture</h2>
+<div class="card">
+<div class="lead">The condition below is BYU beating Baylor, Kansas and Cincinnati to finish 10-2. ESPN's Allstate Playoff Predictor (200,000 simulations, updated Nov 11) then splits the outcome by what happens in the Big 12 championship game - three branches, pick the one you believe.</div>
+<h3 style="margin:16px 0 6px">BYU wins the Big 12 title game <span style="color:var(--mut);font-weight:400;font-size:13px">- 11-2, conference champion, automatic bid</span></h3>
+<div class="grid">
+<div class="stat"><div class="v good">100%</div><div class="l">Make the playoff</div></div>
+<div class="stat"><div class="v good">23%</div><div class="l">Bye (seeds 1-4)</div></div>
+<div class="stat"><div class="v good">67%</div><div class="l">Home game (seeds 5-8)</div></div>
+<div class="stat"><div class="v">11%</div><div class="l">Sneak in (seeds 9-12)</div></div>
+<div class="stat"><div class="v">0%</div><div class="l">Out</div></div>
+</div>
+<h3 style="margin:16px 0 6px">BYU loses the Big 12 title game <span style="color:var(--mut);font-weight:400;font-size:13px">- 10-3, at-large case</span></h3>
+<div class="grid">
+<div class="stat"><div class="v mid">79%</div><div class="l">Make the playoff</div></div>
+<div class="stat"><div class="v">2%</div><div class="l">Bye (seeds 1-4)</div></div>
+<div class="stat"><div class="v mid">40%</div><div class="l">Home game (seeds 5-8)</div></div>
+<div class="stat"><div class="v">37%</div><div class="l">Sneak in (seeds 9-12)</div></div>
+<div class="stat"><div class="v bad">21%</div><div class="l">Out</div></div>
+</div>
+<h3 style="margin:16px 0 6px">BYU doesn't reach the title game <span style="color:var(--mut);font-weight:400;font-size:13px">- 10-2, at-large case</span></h3>
+<div class="grid">
+<div class="stat"><div class="v good">94%</div><div class="l">Make the playoff</div></div>
+<div class="stat"><div class="v">5%</div><div class="l">Bye (seeds 1-4)</div></div>
+<div class="stat"><div class="v good">59%</div><div class="l">Home game (seeds 5-8)</div></div>
+<div class="stat"><div class="v">30%</div><div class="l">Sneak in (seeds 9-12)</div></div>
+<div class="stat"><div class="v bad">6%</div><div class="l">Out</div></div>
+</div>
+<div class="fine" style="margin-top:10px">Numbers are shown exactly as ESPN's predictor displays them. It rounds each to a whole percent, so a branch can total 99-101% (the first adds to 101); nothing is re-normalized. "Out" is 100% minus the displayed make-playoff number. The predictor assumes BYU wins the rest of its regular season - all three games are picked - and simulates every other game; seeds 1-4 get a bye, seeds 5-8 host a first-round game, seeds 9-12 go on the road. No published model says how likely each branch is, so this page does not blend them into a single number. Source: <a href="https://www.espn.com/espn/feature/story/_/page/cfbplayoffpredictor/college-football-allstate-playoff-bracket-predictor" target="_blank" rel="noopener">ESPN Allstate Playoff Predictor</a>, Nov 11, 2026.</div>
+</div>
+
+<details style="margin-top:26px">
+<summary style="cursor:pointer;font-size:20px;font-weight:800">Unconditional context - all futures, not just win-out ones</summary>
+<p class="fine" style="color:var(--a)">Everything in this appendix comes from the cfb.fyi Nov 11 simulation across ALL futures - including ones where BYU loses - and is <b>not</b> conditioned on BYU winning out. It stays for reference; the win-out answer is above.</p>
 
 <h2>Where BYU's seed lands</h2>
 <div class="card">
@@ -135,15 +168,17 @@ button.reset:hover{border-color:var(--b)}
 <div class="fine" style="margin-top:8px">Each conference number is the sum of its ESPN FPI title odds for teams ranked behind BYU in the Nov 10 CFP rankings (only one champion per conference, so those add cleanly; BYU's own 8.3% Big 12 title chance is excluded). The combined &asymp;70% is an approximation that treats the four conference races as independent - FPI's simulations share model correlations, so the true number is somewhat different. Title odds are the Nov 9 FPI snapshot; ranks move weekly, so this changes every Tuesday. cfb.fyi's bracket applies conference-champion automatic bids, so champion-takes-a-spot scenarios are already reflected in the 28.8% / 71.2% above - this card just isolates that one risk. <b>The two numbers measure different things; don't add them.</b> Full team-by-team thief odds and champion picks: <a href="thieves.html">Bid thieves</a>.</div>
 </div>
 
+</details>
+
 <h2>Method and sources</h2>
 <div class="card fine">
-Simulation numbers: <a href="https://cfb.fyi/cfp" target="_blank" rel="noopener">cfb.fyi 2026 playoff projection</a> - their words: "We played out the rest of the season 10,000 times using each game's betting line and team power ratings," updated Nov 11, 2026. Their output is final bracket seeds (with automatic bids applied), not committee-rank movement; no source we found publishes the pairwise odds of one specific team passing another, so those aren't on this page. Seed bands: bye = seeds 1-4, home = 5-8, road = 9-12, out = unseeded. Bid-thief math: <a href="https://www.espn.com/college-football/fpi" target="_blank" rel="noopener">ESPN FPI</a> conference-title odds (Nov 9 snapshot) over the <a href="https://collegefootballplayoff.com/rankings" target="_blank" rel="noopener">Nov 10 CFP rankings</a>. These are model outputs, not committee predictions; the committee decides the real rankings every Tuesday.
+Win-out scenario branches: <a href="https://www.espn.com/espn/feature/story/_/page/cfbplayoffpredictor/college-football-allstate-playoff-bracket-predictor" target="_blank" rel="noopener">ESPN Allstate Playoff Predictor</a> - their words: "There are 200,000 simulations," updated Nov 11, 2026. BYU was picked to beat Baylor, Kansas and Cincinnati; the three branches are the predictor's outputs for BYU winning, losing, or missing the Big 12 title game. Whole-percent values are kept exactly as displayed. Appendix simulation numbers: <a href="https://cfb.fyi/cfp" target="_blank" rel="noopener">cfb.fyi 2026 playoff projection</a> - their words: "We played out the rest of the season 10,000 times using each game's betting line and team power ratings," updated Nov 11, 2026. Their output is final bracket seeds (with automatic bids applied), not committee-rank movement; no source we found publishes the pairwise odds of one specific team passing another, so those aren't on this page. Seed bands: bye = seeds 1-4, home = 5-8, road = 9-12, out = unseeded. Bid-thief math: <a href="https://www.espn.com/college-football/fpi" target="_blank" rel="noopener">ESPN FPI</a> conference-title odds (Nov 9 snapshot) over the <a href="https://collegefootballplayoff.com/rankings" target="_blank" rel="noopener">Nov 10 CFP rankings</a>. These are model outputs, not committee predictions; the committee decides the real rankings every Tuesday.
 </div>
 
 <h2>Play with the bracket</h2>
 <div class="card">
 <div class="lead">The projected 12-team bracket from the Nov 11 simulation - tap a team to advance them and crown your champion</div>
-<p class="fine" style="margin-top:0">First-round games are on the higher seed's campus (Boise State at Notre Dame, Kentucky at Texas, BYU at Miami, Indiana at Tennessee); seeds 1-4 join in the quarterfinals. This is a sandbox: picks here don't change any probability above, which all come from the finished simulation. Picks save on this device. &nbsp;<button class="reset" id="brreset">Reset bracket</button></p>
+<p class="fine" style="margin-top:0">First-round games are on the higher seed's campus (Boise State at Notre Dame, Kentucky at Texas, BYU at Miami, Indiana at Tennessee); seeds 1-4 join in the quarterfinals. This is the cfb.fyi Nov 11 projected field - an <b>illustrative, unconditional</b> projection across all futures, not specific to BYU winning out. It's a sandbox: picks here don't change any probability on this page. Picks save on this device. &nbsp;<button class="reset" id="brreset">Reset bracket</button></p>
 <div class="br" id="bracket"></div>
 <div id="champ" style="font-size:16px;font-weight:700;margin-top:10px"></div>
 <p class="fine" style="margin-top:10px">Want a different field? Champion picks on <a href="thieves.html">Bid thieves</a> change who makes the projected playoff; this bracket follows the cfb.fyi projection.</p>
