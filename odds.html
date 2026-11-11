@@ -29,6 +29,20 @@ h1{font-size:24px;margin:8px 0}h2{font-size:18px;margin:28px 0 8px;color:var(--a
 table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--rule);font-size:14px}th{color:var(--mut);font-size:12px}
 tr.byu td{background:#1d3a5f}
 .rk{display:inline-block;min-width:26px;text-align:center;border-radius:6px;background:#232d47;padding:1px 6px;font-size:12px;margin-right:6px}
+.br{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+.bcol{display:flex;flex-direction:column;gap:10px}
+.bcol .rl{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.08em;text-align:center}
+.game{background:#131a2b;border:1px solid var(--rule);border-radius:10px;padding:6px;flex:1;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.gtm{display:flex;align-items:center;gap:6px;border-radius:7px;padding:6px 8px;cursor:pointer;font-size:13px;user-select:none;border:1px solid transparent}
+.gtm:hover{background:#1d2740}
+.gtm.on{background:#1d3a5f;border-color:var(--b)}
+.gtm.tbd{color:var(--mut);cursor:default;font-style:italic}
+.gtm.tbd:hover{background:none}
+.gtm .sd{color:var(--mut);font-size:11px;min-width:20px}
+.gtm .cf{color:var(--mut);font-size:11px;margin-left:auto}
+button.reset{background:var(--card);border:1px solid var(--rule);color:var(--ink);border-radius:9px;padding:6px 12px;cursor:pointer;font-size:13px}
+button.reset:hover{border-color:var(--b)}
+@media(max-width:700px){.br{grid-template-columns:1fr}}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .chip{background:#131a2b;border:1px solid var(--rule);border-radius:9px;padding:8px 12px;font-size:14px}
 .chip b{color:var(--b)}
@@ -112,6 +126,15 @@ tr.byu td{background:#1d3a5f}
 <div class="card fine">
 Simulation numbers: <a href="https://cfb.fyi/cfp" target="_blank" rel="noopener">cfb.fyi 2026 playoff projection</a> - their words: "We played out the rest of the season 10,000 times using each game's betting line and team power ratings," updated Nov 11, 2026. Their output is final bracket seeds (with automatic bids applied), not committee-rank movement; no source we found publishes the pairwise odds of one specific team passing another, so those aren't on this page. Seed bands: bye = seeds 1-4, home = 5-8, road = 9-12, out = unseeded. Bid-thief math: <a href="https://www.espn.com/college-football/fpi" target="_blank" rel="noopener">ESPN FPI</a> conference-title odds (Nov 9 snapshot) over the <a href="https://collegefootballplayoff.com/rankings" target="_blank" rel="noopener">Nov 10 CFP rankings</a>. These are model outputs, not committee predictions; the committee decides the real rankings every Tuesday.
 </div>
+
+<h2>Play with the bracket</h2>
+<div class="card">
+<div class="lead">The projected 12-team bracket from the Nov 11 simulation - tap a team to advance them and crown your champion</div>
+<p class="fine" style="margin-top:0">First-round games are on the higher seed's campus (Boise State at Notre Dame, Kentucky at Texas, BYU at Miami, Indiana at Tennessee); seeds 1-4 join in the quarterfinals. This is a sandbox: picks here don't change any probability above, which all come from the finished simulation. Picks save on this device. &nbsp;<button class="reset" id="brreset">Reset bracket</button></p>
+<div class="br" id="bracket"></div>
+<div id="champ" style="font-size:16px;font-weight:700;margin-top:10px"></div>
+<p class="fine" style="margin-top:10px">Want a different field? Champion picks on <a href="thieves.html">Bid thieves</a> change who makes the projected playoff; this bracket follows the cfb.fyi projection.</p>
+</div>
 </main>
 <script>
 const $=id=>document.getElementById(id);
@@ -166,5 +189,68 @@ const ahead=Object.entries(T).filter(([n,t])=>t.cfp&&t.cfp<10).sort((a,b)=>b[1].
 const behind=Object.entries(T).filter(([n,t])=>t.cfp&&t.cfp>10).sort((a,b)=>b[1].mf-a[1].mf);
 $("ahead").innerHTML=ahead.map(([n,t])=>`<tr><td><span class="rk">#${t.cfp}</span></td><td>${n}</td><td>${t.c}</td><td>${pct(t.mf)}</td><td>${pct(t.bye)}</td></tr>`).join("");
 $("behind").innerHTML=behind.map(([n,t])=>`<tr><td><span class="rk">#${t.cfp}</span></td><td>${n}</td><td>${t.c}</td><td>${pct(t.mf)}</td><td>${pct(t.home)}</td></tr>`).join("");
+
+// sandbox bracket - cfb.fyi projected field (Nov 11); picks stay on this device
+const BRT={1:"Georgia",2:"Utah",3:"Alabama",4:"UCLA",5:"Notre Dame",6:"Texas",7:"Miami",8:"Tennessee",9:"Indiana",10:"BYU",11:"Kentucky",12:"Boise State"};
+const BRC={1:"SEC",2:"Big 12",3:"SEC",4:"Big Ten",5:"Ind",6:"SEC",7:"ACC",8:"SEC",9:"Big Ten",10:"Big 12",11:"SEC",12:"Pac-12"};
+const ROUNDS=[
+ {l:"First round",games:[["r1a",8,9],["r1b",5,12],["r1c",7,10],["r1d",6,11]]},
+ {l:"Quarterfinals",games:[["qf1",1,"r1a"],["qf2",4,"r1b"],["qf3",2,"r1c"],["qf4",3,"r1d"]]},
+ {l:"Semifinals",games:[["sf1","qf1","qf2"],["sf2","qf3","qf4"]]},
+ {l:"Championship",games:[["f1","sf1","sf2"]]}
+];
+let brp={};
+try{brp=JSON.parse(localStorage.getItem("b12bracketPicks")||"{}")||{}}catch(e){brp={}}
+function brsave(){localStorage.setItem("b12bracketPicks",JSON.stringify(brp))}
+function brparts(gid){
+ for(const rd of ROUNDS)for(const g of rd.games)if(g[0]===gid)
+  return g.slice(1).map(x=>typeof x==="number"?x:brwinner(x));
+ return [];
+}
+function brwinner(gid){
+ const w=brp[gid];
+ return (w&&brparts(gid).includes(w))?w:null;
+}
+function brprune(){
+ let changed=true;
+ while(changed){changed=false;
+  for(const rd of ROUNDS)for(const g of rd.games){
+   const w=brp[g[0]];
+   if(w&&!brparts(g[0]).includes(w)){delete brp[g[0]];changed=true}
+  }
+ }
+}
+function brlabel(x){
+ if(typeof x==="number")return null;
+ const m={r1a:"Winner: Tennessee-Indiana",r1b:"Winner: Notre Dame-Boise St",r1c:"Winner: Miami-BYU",r1d:"Winner: Texas-Kentucky",qf1:"Winner of QF1",qf2:"Winner of QF2",qf3:"Winner of QF3",qf4:"Winner of QF4",sf1:"Winner of SF1",sf2:"Winner of SF2"};
+ return m[x]||"TBD";
+}
+function brrender(){
+ brprune();
+ let html="";
+ ROUNDS.forEach(rd=>{
+  html+=`<div class="bcol"><div class="rl">${rd.l}</div>`;
+  rd.games.forEach(g=>{
+   const gid=g[0],ps=brparts(gid),w=brwinner(gid);
+   html+=`<div class="game">`;
+   ps.forEach((p,i)=>{
+    if(p==null){html+=`<div class="gtm tbd">${brlabel(g[i+1])||"TBD"}</div>`}
+    else{html+=`<div class="gtm${w===p?" on":""}" data-g="${gid}" data-s="${p}"><span class="sd">${p}</span><span>${BRT[p]}</span><span class="cf">${BRC[p]}</span></div>`}
+   });
+   html+=`</div>`;
+  });
+  html+=`</div>`;
+ });
+ $("bracket").innerHTML=html;
+ document.querySelectorAll(".gtm[data-g]").forEach(el=>el.onclick=()=>{
+  const gid=el.dataset.g,s=+el.dataset.s;
+  if(brp[gid]===s)delete brp[gid];else brp[gid]=s;
+  brsave();brrender();
+ });
+ const c=brwinner("f1");
+ $("champ").innerHTML=c?`Your champion: <span style="color:var(--a)">#${c} ${BRT[c]}</span>`:"";
+}
+$("brreset").onclick=()=>{brp={};brsave();brrender()};
+brrender();
 </script>
 </body></html>
