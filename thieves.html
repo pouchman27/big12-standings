@@ -37,7 +37,7 @@ button.reset:hover{border-color:var(--b)}
 <main>
 <nav aria-label="Site navigation" class="nav"><a href="./">&larr; Big 12 tools</a><a href="odds.html">Playoff odds</a><a href="opponents.html">Opponent win %</a><a href="common.html">Common opponents</a><a href="cfp.html">CFP schedules &amp; odds</a><a href="tv.html">BYU rooting guide</a><a href="resume.html">Resume</a><a href="power.html">Power</a></nav>
 <h1>Projected bid thieves</h1>
-<p class="intro">A <b>bid thief</b> (your definition): a team that wins its conference championship game while ranked <b>behind BYU</b>, but still takes a playoff spot. Under the 2026 CFP format the ACC, Big Ten, Big 12 and SEC champions are automatic, the highest-ranked team from the six other leagues - champion or not - is automatic, Notre Dame is in if it finishes in the CFP top 12, and the next seven highest-ranked teams fill the rest. Every champion ranked behind BYU eats one of those spots.</p>
+<p class="intro">A <b>bid thief</b> (your definition): a team that wins its conference championship game while ranked <b>behind BYU</b>, but still takes a playoff spot. Under the 2026 CFP format the ACC, Big Ten, Big 12 and SEC champions are automatic, the highest-ranked team from the six other leagues - champion or not - is automatic, Notre Dame is in if it finishes in the CFP top 12, and the highest-ranked teams left fill the rest - seven spots, or six when Notre Dame takes one. Every champion ranked behind BYU eats one of those spots.</p>
 <p class="fine">Format: <a href="https://collegefootballplayoff.com/news/2026/8/6/sc-aug-2627" target="_blank" rel="noopener">CFP Selection Committee, 2026-27 format</a> and <a href="https://collegefootballplayoff.com/news/2026/11/2/cfp-sc-101" target="_blank" rel="noopener">how the field is built</a>. Title odds are <a href="https://www.espn.com/college-football/fpi" target="_blank" rel="noopener">ESPN FPI</a> season simulations, not a committee prediction. Rankings are the <b>CFP Top 25 from Nov 10, 2026</b>, from the <a href="https://collegefootballplayoff.com/rankings" target="_blank" rel="noopener">official committee release</a>. This is a projection, not a promise.</p>
 
 <div class="card" id="byu"></div>
@@ -63,7 +63,7 @@ button.reset:hover{border-color:var(--b)}
 </div>
 
 <h2>Pick each conference champion</h2>
-<p class="fine">The favorite (ESPN FPI conference-title odds) is preselected. Tap any contender to crown them instead and watch the projected field update. &nbsp;<button class="reset" id="reset">Reset to favorites</button></p>
+<p class="fine">The favorite (ESPN FPI conference-title odds) is preselected. Tap any contender to crown them instead and watch the projected field update. Group of 6 picks are informational only: under the 2026 format the Group of 6 auto bid goes to the highest-ranked Group of 6 team whether or not it wins its league, so those picks do not change the projected field. &nbsp;<button class="reset" id="reset">Reset to favorites</button></p>
 <div class="confs" id="confs"></div>
 
 <h2>Projected 12-team field</h2>
@@ -92,7 +92,10 @@ function rk(t){const v=BASIS==="ap"?t.ap:t.cfp;return v!=null?v:1000}
 function rankOf(t){const v=BASIS==="ap"?t.ap:t.cfp;return v!=null?(BASISLBL+" #"+v):"unranked"}
 function behind(t){return rk(t)>rk(T[BYU])}
 function g5Slot(){
- const cands=G5.map(champ).filter(Boolean);
+ // 2026-27 rule: the Group of 6 auto bid goes to the highest-ranked G6 TEAM, champion or not.
+ // So the champion picks below cannot move this bid. Unranked teams have no committee rank;
+ // their tie-break here is FPI rating - a stand-in, since the committee would rank them itself.
+ const cands=SNAP.teams.map(r=>T[r[0]]).filter(t=>G5.indexOf(t.c)>=0);
  cands.sort((x,y)=>rk(x)-rk(y)||x.fr-y.fr);
  return cands[0];
 }
@@ -108,7 +111,7 @@ function render(){
   ch+=`<div class="card" style="margin:0"><h3>${CN[ck]}</h3>`;
   c.slice(0,5).forEach(t=>{
    const on=ch2&&ch2.id===t.id;
-   const th=t.id===BYU?"":behind(t)?`<span class="tag thief">THIEF</span>`:`<span class="tag aq">ahead of BYU</span>`;
+   const th=(t.id===BYU||G5.indexOf(t.c)>=0)?"":behind(t)?`<span class="tag thief">THIEF</span>`:`<span class="tag aq">ahead of BYU</span>`;
    const byu=t.id===BYU?` <span class="tag byu">BYU</span>`:"";
    ch+=`<div class="tm ${on?"on":""}" data-c="${ck}" data-t="${t.id}"><span class="nm">${t.n}</span>${byu}<span class="rec">${t.cw}-${t.cl} conf &middot; ${rankOf(t)}</span>${th}<span class="odds">${t.wc}%</span></div>`;
   });
@@ -135,7 +138,7 @@ function render(){
  field.sort((x,y)=>rk(x)-rk(y)||x.fr-y.fr);
  let fh=`<tr><th>Seed</th><th>Team</th><th>How they're in</th><th>Ranking</th><th></th></tr>`;
  field.forEach((t,i)=>{
-  const how=isAQ(t)?(CN[t.c]+" champion (auto)"):t.id==="87"?"Notre Dame (top-12 rule)":"At-large";
+  const how=t===g5?(champ(t.c)&&champ(t.c).id===t.id?(CN[t.c]+" champion + highest-ranked Group of 6 team (auto)"):"Highest-ranked Group of 6 team (auto)"):isAQ(t)?(CN[t.c]+" champion (auto)"):t.id==="87"?"Notre Dame (top-12 rule)":"At-large";
   const th=isAQ(t)&&behind(t)?`<span class="tag thief">THIEF</span>`:"";
   const byu=t.id===BYU?` <span class="tag byu">BYU</span>`:"";
   const note=rk(t)>=1000?("outside "+BASISLBL+" top 25 - seeded at the back as an auto-bid"):"";
@@ -149,7 +152,7 @@ function render(){
  if(byuChamp)stat=`<b class="winning">BYU is in as Big 12 champion</b> in this projection.`;
  else if(byuIn)stat=`<b class="winning">BYU is in as an at-large (seed #${field.indexOf(byuIn)+1}).</b>`;
  else stat=`<b class="losing">BYU is OUT in this projection.</b>`;
- stat+=` Bid thieves in the field (champions ranked behind BYU): <b>${thieves.length}</b>${thieves.length?" - "+thieves.map(t=>`${t.n} (${CN[t.c]})`).join(", "):""}.`;
+ stat+=` Auto-bid teams in the field ranked behind BYU: <b>${thieves.length}</b>${thieves.length?" - "+thieves.map(t=>`${t.n} (${CN[t.c]})`).join(", "):""}.`;
  $("byustat").innerHTML=stat;
  $("src").textContent=live()+" Champion picks save on this device. Rankings: official CFP Top 25 from Nov 10, 2026. FPI odds update separately; champion picks stay saved on this device.";
 }
