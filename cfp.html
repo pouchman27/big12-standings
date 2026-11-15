@@ -31,11 +31,29 @@
 .chip.on-win{background:#3fb950;color:#07130b;border-color:#3fb950}.chip.on-loss{background:#f85149;color:#fff;border-color:#f85149}
 .finalrec{display:block;margin-top:8px;padding-top:8px;border-top:1px solid var(--rule)}.finalrec span{display:block;font-size:11px;color:var(--mut)}.finalrec strong{display:block;font-size:15px}.finalrec small{display:block;font-size:11px;color:var(--mut);line-height:1.3}
 @media(min-width:1000px){.team{grid-template-columns:190px minmax(0,1fr) 150px!important}.weekheading{grid-template-columns:190px minmax(0,1fr) 150px!important}}
+.results{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:14px 16px;margin:14px 0}.resultlines{display:grid;grid-template-columns:1fr 1fr;gap:4px 26px;font-size:14px}.rline{display:flex;justify-content:space-between;gap:8px;padding:3px 0}.rline b{color:var(--a);font-weight:600}.rday{color:var(--mut);font-size:12px;white-space:nowrap}@media(max-width:560px){.resultlines{grid-template-columns:1fr}}
 </style></head><body><main>
 <nav class="nav" aria-label="Site navigation"><a href="./">&#8592; Big 12 tools</a><a href="odds.html">Playoff odds</a><a href="https://pouchman27.github.io/cfb-playoff/">Playoff sandbox</a><a href="opponents.html">Opponent win %</a><a href="common.html">Common opponents</a><a href="thieves.html">Bid thieves</a><a href="resume.html">Resume</a><a href="power.html">Power</a></nav>
 <h1>CFP remaining schedules</h1><p class="intro">The committee's top 25, in ranking order. Each game's win probability is for the ranked team. The estimate on the right is its chance to win every remaining regular-season game. Tap a &quot;wins&quot; chip to pick a game's winner, or tap the game background to cycle win, loss and unpicked. Games between ranked teams stay linked. The final record on the right adds your picks to the current record; unpicked games show a worst-to-best range.</p>
 <div class="tools"><button id="refresh">Refresh ESPN data</button><button id="clearpicks" type="button" hidden>Clear picks</button><label for="jump">Jump to team <select id="jump"><option value="">All 25, in order</option></select></label></div>
 <details class="method"><summary>How the probabilities work</summary><p><b>Game win:</b> ESPN Matchup Predictor values, not betting odds. A dash means ESPN has no prediction available.</p><p><b>Win out:</b> our estimate, multiplying the listed game probabilities and assuming independent outcomes. For example, 80% × 70% = 56%. It is not an ESPN season projection or a chance of making the playoff. Injuries, changing team strength and related outcomes can make the true chance different.</p><p><b>Pick winners:</b> tap or click a game to cycle: this team wins, this team loses, then back to no pick. When two ranked teams play each other, the game stays linked on both cards, so picking BYU to beat Utah also counts it as a Utah loss. A picked win counts as 100% and a picked loss as 0% in the win-out estimate; unpicked games keep ESPN's probability. Picks are saved in this browser only; Clear picks resets them.</p><p>Regular season only. Conference championships and postseason games are excluded. Completed games are removed on refresh. Dates and any confirmed kickoff times are shown in Eastern time; TBD games retain ESPN's listed game date. No invented 50/50 values are substituted for missing odds.</p></details>
+<section class="results" id="results"><h2>Results &middot; week of Nov 14</h2><div class="resultlines">
+<div class="rline"><span><b>#4 UCLA</b> 22, Illinois 14</span><span class="rday">Fri</span></div>
+<div class="rline"><span>Colorado 42, <b>#14 Houston</b> 32</span><span class="rday">Fri</span></div>
+<div class="rline"><span><b>#1 Georgia</b> 48, <b>#22 Missouri</b> 21</span><span class="rday">Sat</span></div>
+<div class="rline"><span><b>#3 Alabama</b> 21, Vanderbilt 6</span><span class="rday">Sat</span></div>
+<div class="rline"><span><b>#5 Notre Dame</b> 41, Boston College 7</span><span class="rday">Sat</span></div>
+<div class="rline"><span><b>#7 Miami</b> 36, Duke 25</span><span class="rday">Sat</span></div>
+<div class="rline"><span><b>#8 Tennessee</b> 22, Texas A&amp;M 7</span><span class="rday">Sat</span></div>
+<div class="rline"><span><b>#9 Indiana</b> 27, <b>#18 USC</b> 13</span><span class="rday">Sat</span></div>
+<div class="rline"><span><b>#10 BYU</b> 28, Baylor 7</span><span class="rday">Sat</span></div>
+<div class="rline"><span>Florida 21, <b>#11 Kentucky</b> 14</span><span class="rday">Sat</span></div>
+<div class="rline"><span><b>#13 Wake Forest</b> 49, SMU 7</span><span class="rday">Sat</span></div>
+<div class="rline"><span><b>#15 Iowa</b> 28, Purdue 7</span><span class="rday">Sat</span></div>
+<div class="rline"><span><b>#16 Oregon</b> 31, Michigan 7</span><span class="rday">Sat</span></div>
+<div class="rline"><span><b>#20 Ohio State</b> 28, Northwestern 19</span><span class="rday">Sat</span></div>
+<div class="rline"><span><b>#24 Boise St</b> 46, Oregon St 41</span><span class="rday">Sat</span></div>
+</div><p class="meta" style="margin-top:10px">Finals for CFP top-25 teams, via ESPN. In progress at snapshot time: Texas at LSU, South Carolina at Arkansas, Texas Tech at Oklahoma St, Utah at Arizona.</p></section>
 <p id="status" class="status" role="status" aria-live="polite"></p><div id="weekheader"></div><div id="teams"></div>
 <footer class="sources">Sources: <a href="https://collegefootballplayoff.com/rankings" target="_blank" rel="noopener">Official CFP rankings</a><a href="https://www.espn.com/college-football/rankings" target="_blank" rel="noopener">ESPN rankings</a><p>Schedules and Matchup Predictor: ESPN. Tap any opponent for the game source. Snapshot checked November 14, 2026. Live data is requested on each visit; if unavailable, the dated snapshot stays visible.</p></footer>
 </main><script>
