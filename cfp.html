@@ -75,12 +75,12 @@ async function refresh(){if(busy)return;busy=true;el('refresh').disabled=true;el
  const fetchedAt=new Date().toISOString();
  const results=await pool(r.ranks,async x=>{
   const id=String(x.team.id),s=await get('teams/'+id+'/schedule?season=2026&seasontype=2');if(!Array.isArray(s.events)||s.season?.year!==2026)throw Error('Schedule unavailable');
-  const games=[];
-  for(const e of s.events){const c=e.competitions?.[0];if(!c)continue;const status=c.status?.type||e.status?.type||{};if(status.completed)continue;if(!['pre','in'].includes(status.state))continue;
-   const me=c.competitors.find(z=>String(z.team.id)===id),opp=c.competitors.find(z=>String(z.team.id)!==id);if(!me||!opp)continue;
-   games.push({id:e.id,date:e.date,timeValid:!!e.timeValid,opponent:opp.team.shortDisplayName||opp.team.location||opp.team.displayName,opponentId:opp.team.id,venue:c.neutralSite?'N':me.homeAway,status:status.state,probability:null,url:null});
+  const games=[];let rec=x.recordSummary||'';
+  for(const e of s.events.slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)))){const c=e.competitions?.[0];if(!c)continue;const status=c.status?.type||e.status?.type||{};const me=c.competitors?.find(z=>String(z.team.id)===id),opp=c.competitors?.find(z=>String(z.team.id)!==id);if(status.completed){if(me){const r0=(me.record||[]).find(r=>r.type==='total')||(me.record||[])[0];const rv=r0&&(r0.summary||r0.displayValue);if(rv)rec=rv}continue}if(!['pre','in'].includes(status.state))continue;
+   if(!me||!opp)continue;const oname=opp.team.shortDisplayName||opp.team.location||opp.team.displayName;if(oname==='TBD')continue;
+   games.push({id:e.id,date:e.date,timeValid:!!e.timeValid,opponent:oname,opponentId:opp.team.id,venue:c.neutralSite?'N':me.homeAway,status:status.state,probability:null,url:null});
   }
-  return {rank:x.current,id,name:x.team.nickname||x.team.location,record:x.recordSummary||'',games:games.sort((a,b)=>a.date.localeCompare(b.date)),live:true,fetchedAt};
+  return {rank:x.current,id,name:x.team.nickname||x.team.location,record:rec,games:games.sort((a,b)=>a.date.localeCompare(b.date)),live:true,fetchedAt};
  });
  const teams=results.map((res,i)=>res.value||(()=>{const x=r.ranks[i],old=data.teams.find(t=>t.id===String(x.team.id));return old?{...old,fetchedAt:old.fetchedAt||data.fetchedAt,rank:x.current,record:x.recordSummary||old.record,error:true,live:false}:{rank:x.current,id:String(x.team.id),name:x.team.nickname||x.team.location,record:x.recordSummary||'',games:[],error:true,live:false,missing:true}})());
  const ids=[...new Set(teams.filter(t=>t.live).flatMap(t=>t.games.map(g=>g.id)))];
