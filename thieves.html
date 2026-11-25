@@ -46,24 +46,13 @@ button.reset:hover{border-color:var(--b)}
 <h2>Bid thief count: exactly 1, 2, or 3?</h2>
 <div class="card">
 <div class="lead">Chance that exactly this many power-conference title games are won by a team ranked behind BYU (or unranked) - calculated from the FPI title odds on this page. NOTE: these inputs cover ALL futures - they are <b>not</b> conditioned on BYU winning out (see the fine print).</div>
-<div class="grid">
-<div class="stat"><div class="v">12.7%</div><div class="l">0 thieves - every P4 champ stays ranked ahead of BYU</div></div>
-<div class="stat"><div class="v mid">41.3%</div><div class="l">Exactly 1 thief</div></div>
-<div class="stat"><div class="v mid">36.3%</div><div class="l">Exactly 2 thieves</div></div>
-<div class="stat"><div class="v bad">9.6%</div><div class="l">Exactly 3 thieves</div></div>
-<div class="stat"><div class="v bad">&lt;0.1%</div><div class="l">All 4 conferences</div></div>
-</div>
-<div class="chips" style="margin-top:8px">
-<div class="chip">Big Ten thief odds <b>67.0%</b></div>
-<div class="chip">Big 12 thief odds <b>37.1%</b></div>
-<div class="chip">ACC thief odds <b>38.8%</b></div>
-<div class="chip">SEC thief odds <b>0.0%</b></div>
-</div>
-<div class="fine" style="margin-top:8px"><b>Two honest limits.</b> (1) A "thief" is a team ranked behind BYU that wins its conference and takes an automatic-bid spot - that is NOT the same as a team passing BYU in the committee rankings. True "jumped by 1/2/3 teams" odds need per-simulation committee ranks, which no source we found publishes; the Monte Carlo on the <a href="odds.html">Playoff odds</a> page estimates them under explicit, adjustable ranking stand-ins. (2) The four inputs are ESPN FPI conference-title odds from the Nov 22 refresh. These published inputs cover all futures, not just BYU winning out; this calculation does not condition them on BYU's results. <b>How the count works:</b> each conference's number sums its behind-BYU teams' title odds (one champion per conference, so those add cleanly); the count then treats the four conference races as independent - an approximation. Consistency check: 100% - 12.7% = 87.3% chance of at least one thief. Sources: <a href="https://www.espn.com/college-football/fpi" target="_blank" rel="noopener">ESPN FPI</a> title odds (Nov 22) over the <a href="https://collegefootballplayoff.com/rankings" target="_blank" rel="noopener">Nov 24 CFP rankings</a>.</div>
+<div class="grid" id="cntgrid"></div>
+<div class="chips" style="margin-top:8px" id="cntchips"></div>
+<div class="fine" style="margin-top:8px"><b>Two honest limits.</b> (1) A "thief" is a team ranked behind BYU that wins its conference and takes an automatic-bid spot - that is NOT the same as a team passing BYU in the committee rankings. True "jumped by 1/2/3 teams" odds need per-simulation committee ranks, which no source we found publishes; the Monte Carlo on the <a href="odds.html">Playoff odds</a> page estimates them under explicit, adjustable ranking stand-ins. (2) The four inputs are ESPN FPI conference-title odds (live from ESPN when reachable; otherwise the Nov 22 snapshot, see the status line at the bottom). These published inputs cover all futures, not just BYU winning out; this calculation does not condition them on BYU's results. (3) Champions are held at their current committee rank. A title winner would probably climb in the rankings, so a team counted as a thief here may end up ahead of BYU; treat the numbers as an upper bound under your definition, not a forecast of the final rankings. <b>How the count works:</b> each conference's number sums its behind-BYU teams' title odds (one champion per conference, so those add cleanly); the count then treats the four conference races as independent - an approximation. <span id="cntcons"></span> Sources: <a href="https://www.espn.com/college-football/fpi" target="_blank" rel="noopener">ESPN FPI</a> title odds over the <a href="https://collegefootballplayoff.com/rankings" target="_blank" rel="noopener">Nov 24 CFP rankings</a>.</div>
 </div>
 
 <h2>Pick each conference champion</h2>
-<p class="fine">The favorite (ESPN FPI conference-title odds) is preselected. Tap any contender to crown them instead and watch the projected field update. Group of 6 picks are informational only: under the 2026 format the Group of 6 auto bid goes to the highest-ranked Group of 6 team whether or not it wins its league, so those picks do not change the projected field. Seeding follows the committee rankings, with an auto bid ranked outside the top 12 slotted at the back - the official 2026-27 rule, so the Group of 6 bid (Boise St, CFP #17) always seeds #12 on this page. &nbsp;<button class="reset" id="reset">Reset to favorites</button></p>
+<p class="fine">The favorite (ESPN FPI conference-title odds) is preselected. Tap any contender to crown them instead and watch the projected field update. Group of 6 picks are informational only: under the 2026 format the Group of 6 auto bid goes to the highest-ranked Group of 6 team whether or not it wins its league, so those picks do not change the projected field. Seeding follows the committee rankings, with an auto bid ranked outside the top 12 slotted at the back - the official 2026-27 rule, so the Group of 6 bid (Boise State, the committee's selected top remaining-conference team; unranked in the Nov 24 Top 25) always seeds #12 on this page. &nbsp;<button class="reset" id="reset">Reset to favorites</button></p>
 <div class="confs" id="confs"></div>
 
 <h2>Projected 12-team field</h2>
@@ -95,11 +84,25 @@ function g5Slot(){
  // 2026-27 rule: the Group of 6 auto bid goes to the highest-ranked G6 TEAM, champion or not.
  // So the champion picks below cannot move this bid. Unranked teams have no committee rank;
  // their tie-break here is FPI rating - a stand-in, since the committee would rank them itself.
+ // Nov 24 CFP release: the committee selected Boise State as the best team from the remaining conferences.
+ if(T["68"])return T["68"];
  const cands=SNAP.teams.map(r=>T[r[0]]).filter(t=>G5.indexOf(t.c)>=0);
  cands.sort((x,y)=>rk(x)-rk(y)||x.fr-y.fr);
  return cands[0];
 }
+function renderCount(){
+ const ps=P4.map(ck=>({ck,p:contenders(ck).filter(t=>t.id!==BYU&&behind(t)).reduce((a,t)=>a+t.wc,0)/100}));
+ let d=[1];
+ ps.forEach(o=>{const n=new Array(d.length+1).fill(0);d.forEach((v,i)=>{n[i]+=v*(1-o.p);n[i+1]+=v*o.p});d=n});
+ const f=x=>{const v=Math.round(x*1000)/10;return v<0.05?"<0.1%":v.toFixed(1)+"%"};
+ const cls=i=>i===0?"":i<3?"mid":"bad";
+ const lab=["0 thieves - every P4 champ stays ranked ahead of BYU","Exactly 1 thief","Exactly 2 thieves","Exactly 3 thieves","All 4 conferences"];
+ $("cntgrid").innerHTML=d.map((v,i)=>`<div class="stat"><div class="v ${cls(i)}">${f(v)}</div><div class="l">${lab[i]}</div></div>`).join("");
+ $("cntchips").innerHTML=ps.map(o=>`<div class="chip">${CN[o.ck]} thief odds <b>${f(o.p)}</b></div>`).join("");
+ $("cntcons").textContent="Consistency check: 100% - "+f(d[0])+" = "+f(1-d[0])+" chance of at least one thief.";
+}
 function render(){
+ renderCount();
  const b=T[BYU];
  $("byu").innerHTML=`<div class="lead">BYU checkpoint</div>
  <div style="font-size:18px;font-weight:700;margin-top:4px">BYU - CFP #${b.cfp} <span style="color:var(--mut);font-weight:400;font-size:13px">(Nov 24, 2026)</span> &middot; ${b.ow}-${b.ol} overall, ${b.cw}-${b.cl} in the Big 12</div>
@@ -135,7 +138,7 @@ function render(){
  for(const t of atlarge){if(need<=0)break;field.push(t);need--}
  // Official 2026-27 seeding (CFP Selection Committee 101): seeds follow the committee ranking,
  // but an auto bid ranked outside the top 12 slots at the bottom of the bracket, in rank order.
- // With the Nov 17 rankings the Group of 6 auto bid always sits outside the top 12, so it seeds #12.
+ // With the Nov 24 rankings the Group of 6 auto bid always sits outside the top 12, so it seeds #12.
  const isAQ=t=>champs.indexOf(t)>=0;
  field.sort((x,y)=>{const ax=isAQ(x)&&rk(x)>12?1:0, ay=isAQ(y)&&rk(y)>12?1:0;return ax-ay||rk(x)-rk(y)||x.fr-y.fr});
  let fh=`<tr><th>Seed</th><th>Team</th><th>How they're in</th><th>Ranking</th><th></th></tr>`;
